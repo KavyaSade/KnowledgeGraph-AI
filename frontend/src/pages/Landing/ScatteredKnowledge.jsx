@@ -96,13 +96,13 @@ const ScatteredKnowledge = () => {
   const activeNodeData = fragments.find(f => f.id === hoveredNode);
 
   return (
-    <section id="scattered-knowledge" className="light-section" style={{ padding: '8rem 0', borderTop: '1px solid var(--border-color)', position: 'relative', overflow: 'hidden' }}>
+    <section id="scattered-knowledge" className="light-section" style={{ padding: '8rem 0', borderTop: '1px solid rgba(0, 243, 255, 0.15)', position: 'relative', overflow: 'hidden' }}>
       <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
         
         {/* Title & Description */}
         <div style={{ textAlign: 'center', maxWidth: '640px' }}>
           <span className="text-label" style={{ marginBottom: '1rem', display: 'inline-block' }}>Semantic Layer</span>
-          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>
             Your information is scattered. <br />
             Your knowledge <span className="accent-highlight">isn’t.</span>
           </h2>
@@ -122,10 +122,10 @@ const ScatteredKnowledge = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
+            background: 'rgba(255, 255, 255, 0.85)',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
             borderRadius: '16px',
-            boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.01), 0 6px 20px rgba(0,0,0,0.01)',
+            boxShadow: '0 12px 40px rgba(15, 23, 42, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
             overflow: 'visible'
           }}
         >
@@ -140,7 +140,7 @@ const ScatteredKnowledge = () => {
                 if (!fromNode || !toNode) return null;
                 
                 const isActive = hoveredNode === link.from || hoveredNode === link.to;
-                const activeColor = hoveredNode ? (fragments.find(f => f.id === hoveredNode)?.color || '#4F46E5') : '#4F46E5';
+                const activeColor = hoveredNode ? (fragments.find(f => f.id === hoveredNode)?.color || 'var(--accent-indigo)') : 'var(--accent-indigo)';
 
                 return (
                   <line 
@@ -149,8 +149,8 @@ const ScatteredKnowledge = () => {
                     y1={fromNode.y} 
                     x2={toNode.x} 
                     y2={toNode.y} 
-                    stroke={isActive ? activeColor : 'rgba(17, 17, 17, 0.08)'} 
-                    strokeWidth={isActive ? 1.8 : 1}
+                    stroke={isActive ? activeColor : 'rgba(15, 23, 42, 0.06)'} 
+                    strokeWidth={isActive ? 2.5 : 1.2}
                     style={{ transition: 'stroke 0.25s, stroke-width 0.25s' }}
                   />
                 );
@@ -167,8 +167,8 @@ const ScatteredKnowledge = () => {
                     y1={0}
                     x2={node.x}
                     y2={node.y}
-                    stroke={isActive ? node.color : 'rgba(17, 17, 17, 0.06)'}
-                    strokeWidth={isActive ? 2 : 1}
+                    stroke={isActive ? node.color : 'rgba(15, 23, 42, 0.04)'}
+                    strokeWidth={isActive ? 2.5 : 1}
                     style={{ transition: 'stroke 0.25s, stroke-width 0.25s' }}
                   />
                 );
@@ -180,22 +180,22 @@ const ScatteredKnowledge = () => {
           <div
             style={{
               position: 'absolute',
-              width: '140px',
-              height: '140px',
+              width: '145px',
+              height: '145px',
               borderRadius: '50%',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              padding: '1rem',
-              background: '#FFFFFF',
+              padding: '1.25rem',
+              background: 'var(--bg-surface)',
               border: hoveredNode 
-                ? `1.5px solid ${activeNodeData?.color}` 
-                : '1.5px solid var(--accent-indigo)',
+                ? `2px solid ${activeNodeData?.color}` 
+                : '2px solid var(--accent-indigo)',
               boxShadow: hoveredNode
-                ? `0 6px 15px rgba(0,0,0,0.03), 0 0 12px ${activeNodeData?.color}15`
-                : '0 4px 12px rgba(0, 0, 0, 0.02)',
+                ? `0 6px 20px rgba(15,23,42,0.06), 0 0 15px ${activeNodeData?.color}20`
+                : '0 4px 15px rgba(15, 23, 42, 0.04)',
               zIndex: 15,
               pointerEvents: 'none',
               transition: 'border-color 0.25s, box-shadow 0.25s',
@@ -203,26 +203,26 @@ const ScatteredKnowledge = () => {
           >
             <div style={{ zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <span style={{ 
-                fontSize: '0.6rem', 
-                fontWeight: 700, 
+                fontSize: '0.625rem', 
+                fontWeight: 800, 
                 textTransform: 'uppercase', 
-                letterSpacing: '0.06em', 
-                color: hoveredNode ? activeNodeData?.color : 'var(--text-secondary)',
+                letterSpacing: '0.08em', 
+                color: hoveredNode ? activeNodeData?.color : 'var(--accent-indigo)',
                 transition: 'color 0.25s'
               }}>
                 {hoveredNode ? 'Semantic Link' : 'System Core'}
               </span>
               <h4 style={{ 
-                fontSize: '0.75rem', 
+                fontSize: '0.8rem', 
                 fontWeight: 800, 
-                color: '#111111',
-                margin: '0.2rem 0',
+                color: 'var(--text-primary)',
+                margin: '0.25rem 0',
                 fontFamily: "'Manrope', sans-serif"
               }}>
-                {hoveredNode ? activeNodeData?.label : 'Brain Network'}
+                {hoveredNode ? activeNodeData?.label : 'Knowledge Hub'}
               </h4>
               <p style={{ 
-                fontSize: '0.625rem', 
+                fontSize: '0.65rem', 
                 color: 'var(--text-secondary)', 
                 lineHeight: 1.35,
                 maxWidth: '120px',
@@ -230,7 +230,7 @@ const ScatteredKnowledge = () => {
               }}>
                 {hoveredNode 
                   ? activeNodeData?.description 
-                  : 'Hover nodes to trace relations.'}
+                  : 'Hover nodes to trace relationships.'}
               </p>
             </div>
           </div>
@@ -248,23 +248,23 @@ const ScatteredKnowledge = () => {
                   left: '50%',
                   top: '50%',
                   transform: `translate(calc(-50% + ${frag.x}px), calc(-50% + ${frag.y}px))`,
-                  padding: '0.5rem 0.85rem',
-                  backgroundColor: '#FFFFFF',
+                  padding: '0.55rem 1rem',
+                  backgroundColor: 'var(--bg-surface)',
                   border: isHovered 
-                    ? `1.5px solid ${frag.color}` 
-                    : '1px solid rgba(17, 17, 17, 0.08)',
+                    ? `2px solid ${frag.color}` 
+                    : '1px solid rgba(15, 23, 42, 0.1)',
                   borderRadius: '30px',
                   fontSize: '0.8rem',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   color: 'var(--text-primary)',
                   boxShadow: isHovered 
-                    ? `0 4px 12px rgba(0, 0, 0, 0.05), 0 0 10px ${frag.color}15` 
-                    : '0 2px 6px rgba(0,0,0,0.01)',
+                    ? '0 6px 20px rgba(15, 23, 42, 0.08)' 
+                    : '0 2px 8px rgba(15, 23, 42, 0.02)',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   display: 'flex',
                   alignItems: 'center',
-                  opacity: isHovered ? 1 : (isAnyHovered ? 0.4 : 1),
+                  opacity: isHovered ? 1 : (isAnyHovered ? 0.35 : 1),
                   transition: 'all 0.25s ease',
                   zIndex: isHovered ? 20 : 10
                 }}
@@ -291,15 +291,15 @@ const ScatteredKnowledge = () => {
             height: 380px !important;
           }
           /* Adjust node sizes and positions on mobile */
-          div[style*="140px"] {
+          div[style*="145px"] {
             width: 110px !important;
             height: 110px !important;
             padding: 0.5rem !important;
           }
-          div[style*="140px"] h4 {
+          div[style*="145px"] h4 {
             font-size: 0.65rem !important;
           }
-          div[style*="140px"] p {
+          div[style*="145px"] p {
             font-size: 0.55rem !important;
             max-width: 90px !important;
           }

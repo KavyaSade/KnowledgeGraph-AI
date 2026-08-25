@@ -50,20 +50,20 @@ const NLSearch = () => {
     { name: 'Project Alpha', color: 'var(--accent-cyan)' },
     { name: 'Battery Storage', color: 'var(--accent-violet)' },
     { name: 'Energy Research', color: 'var(--accent-blue)' },
-    { name: 'Research Note', color: '#FAFAF8' }
+    { name: 'Research Note', color: 'var(--accent-pink)' }
   ];
 
   return (
-    <section className="dark-section" style={{ padding: '8rem 0', overflow: 'hidden', position: 'relative' }}>
+    <section className="light-section" style={{ padding: '8rem 0', overflow: 'hidden', position: 'relative' }}>
       <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3.5rem' }}>
         
         {/* Header */}
         <div style={{ textAlign: 'center', maxWidth: '600px' }}>
           <span className="text-label" style={{ marginBottom: '1rem', display: 'inline-block' }}>Conversational Search</span>
-          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-dark-primary)', marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1.25rem' }}>
             Ask your knowledge base anything.
           </h2>
-          <p style={{ color: 'var(--text-dark-secondary)', fontSize: '1.05rem', lineHeight: 1.6 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.6 }}>
             Run complex queries across your papers, tasks, and bookmarks. The AI retrieves matching links and renders paths of connected insights.
           </p>
         </div>
@@ -76,19 +76,20 @@ const NLSearch = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              padding: '0.85rem 1.25rem',
-              backgroundColor: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border-dark-color)',
+              padding: '0.95rem 1.4rem',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               position: 'relative',
               fontSize: '1rem',
-              color: '#fff',
+              color: 'var(--text-primary)',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.02)'
             }}
           >
-            <span style={{ marginRight: '0.75rem', color: 'var(--text-dark-secondary)' }}>⌕</span>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <span style={{ marginRight: '0.75rem', color: 'var(--accent-indigo)', fontWeight: 'bold' }}>⌕</span>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', fontWeight: 600 }}>
               {queryText}
-              <span className="cursor-blink-dark" style={{ width: '2px', height: '18px', backgroundColor: 'var(--accent-cyan)', marginLeft: '2px' }} />
+              <span className="cursor-blink-dark" style={{ width: '2px', height: '18px', backgroundColor: 'var(--accent-indigo)', marginLeft: '2px' }} />
             </div>
           </div>
 
@@ -103,17 +104,18 @@ const NLSearch = () => {
                   transition={{ duration: 0.5 }}
                   style={{
                     padding: '2rem',
-                    backgroundColor: 'rgba(28, 28, 28, 0.5)',
-                    border: '1px solid var(--border-dark-color)',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '8px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '1.5rem',
+                    boxShadow: '0 12px 30px rgba(15, 23, 42, 0.04)'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase' }}>4 connections found</span>
-                    <button onClick={handleReplay} style={{ fontSize: '0.75rem', color: 'var(--text-dark-secondary)', fontWeight: 600 }}>Replay Search</button>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-indigo)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>4 connections found</span>
+                    <button onClick={handleReplay} style={{ fontSize: '0.75rem', color: 'var(--accent-indigo)', fontWeight: 750 }}>Replay Search</button>
                   </div>
 
                   {/* Horizontal Connection Pathway */}
@@ -125,14 +127,14 @@ const NLSearch = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.2 }}
                           style={{
-                            padding: '0.5rem 1rem',
-                            border: '1px solid var(--border-dark-color)',
-                            borderLeft: `3px solid ${step.color}`,
+                            padding: '0.55rem 1.1rem',
+                            border: '1px solid var(--border-color)',
+                            borderLeft: `3.5px solid ${step.color}`,
                             borderRadius: '4px',
-                            backgroundColor: 'rgba(255,255,255,0.02)',
+                            backgroundColor: 'var(--bg-secondary)',
                             fontSize: '0.85rem',
-                            fontWeight: 600,
-                            color: '#fff',
+                            fontWeight: 700,
+                            color: 'var(--text-primary)'
                           }}
                         >
                           {step.name}
@@ -141,9 +143,9 @@ const NLSearch = () => {
                         {idx < pathSteps.length - 1 && (
                           <motion.span
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
+                            animate={{ opacity: 0.65 }}
                             transition={{ delay: idx * 0.2 + 0.1 }}
-                            style={{ padding: '0 0.25rem', color: 'var(--text-dark-secondary)', fontWeight: 'bold' }}
+                            style={{ padding: '0 0.25rem', color: 'var(--accent-indigo)', fontWeight: 'bold' }}
                           >
                             ➔
                           </motion.span>

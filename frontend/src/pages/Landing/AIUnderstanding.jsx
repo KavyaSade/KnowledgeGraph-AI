@@ -30,7 +30,7 @@ const AIUnderstanding = () => {
     { label: 'Solar Research', type: 'document', color: 'var(--accent-indigo)' },
     { label: 'Project Alpha', type: 'project', color: 'var(--accent-blue)' },
     { label: 'Battery Storage', type: 'topic', color: 'var(--accent-cyan)' },
-    { label: 'Research Notes', type: 'note', color: '#111111' },
+    { label: 'Research Notes', type: 'note', color: 'var(--accent-violet)' },
   ];
 
   return (
@@ -64,8 +64,9 @@ const AIUnderstanding = () => {
           className="minimal-card"
           style={{
             minHeight: '380px',
-            backgroundColor: 'var(--bg-secondary)',
-            borderColor: 'var(--border-color)',
+            backgroundColor: 'rgba(11, 15, 26, 0.85)',
+            borderColor: 'rgba(0, 243, 255, 0.25)',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.05)',
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem',
@@ -73,19 +74,19 @@ const AIUnderstanding = () => {
           }}
         >
           {/* Console Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.15)', paddingBottom: '0.75rem' }}>
             <div style={{ display: 'flex', gap: '0.4rem' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444' }} />
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#eab308' }} />
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 6px #ef4444' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#eab308', boxShadow: '0 0 6px #eab308' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
             </div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>AI Processing Pipeline</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>AI Processing Pipeline</div>
           </div>
 
           {/* User Input Block */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Input Command</span>
-            <div style={{ padding: '0.85rem 1rem', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '0.95rem', fontWeight: 500, color: '#111' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Input Command</span>
+            <div style={{ padding: '0.85rem 1rem', background: 'rgba(0, 243, 255, 0.03)', border: '1px solid rgba(0, 243, 255, 0.2)', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 600, color: '#ffffff', letterSpacing: '0.01em' }}>
               "Find everything related to my renewable energy research and Project Alpha."
             </div>
           </div>
@@ -95,15 +96,19 @@ const AIUnderstanding = () => {
             
             {/* Loading sequence indicators */}
             {step > 0 && step < 5 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                 {stepsList.slice(0, step).map((stepText, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{ fontSize: '0.85rem', fontWeight: 600, color: idx === step - 1 ? 'var(--accent-indigo)' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    style={{ fontSize: '0.85rem', fontWeight: 700, color: idx === step - 1 ? 'var(--accent-cyan)' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    {idx === step - 1 ? <span className="console-spinner" /> : '✓'}
+                    {idx === step - 1 ? (
+                      <span className="console-spinner" style={{ borderColor: 'rgba(0, 243, 255, 0.2)', borderTopColor: 'var(--accent-cyan)' }} />
+                    ) : (
+                      <span style={{ color: 'var(--accent-emerald)', fontWeight: 'bold' }}>✓</span>
+                    )}
                     {stepText}
                   </motion.div>
                 ))}
@@ -120,18 +125,18 @@ const AIUnderstanding = () => {
                   style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-indigo)', textTransform: 'uppercase' }}>✓ Graph Mapping Finalized</span>
-                    <button onClick={handleRestart} style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Replay simulation</button>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-emerald)', textTransform: 'uppercase', letterSpacing: '0.05em', textShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }}>✓ Graph Mapping Finalized</span>
+                    <button onClick={handleRestart} style={{ fontSize: '0.75rem', fontWeight: 750, color: 'var(--accent-cyan)' }}>Replay simulation</button>
                   </div>
 
                   {/* Visual Node Tree */}
                   <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                     {/* Root Node */}
-                    <div style={{ padding: '0.5rem 1rem', border: '1px solid var(--accent-indigo)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-indigo)', backgroundColor: 'var(--bg-primary)' }}>
+                    <div style={{ padding: '0.55rem 1rem', border: '1px solid var(--accent-cyan)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-cyan)', backgroundColor: 'rgba(0, 243, 255, 0.05)', boxShadow: '0 0 12px rgba(0, 243, 255, 0.15)' }}>
                       Renewable Energy
                     </div>
                     {/* Connection Line */}
-                    <div style={{ width: '20px', height: '1px', backgroundColor: 'var(--border-color)' }} />
+                    <div style={{ width: '25px', height: '1.5px', backgroundColor: 'var(--accent-cyan)', boxShadow: '0 0 8px var(--accent-cyan)' }} />
                     
                     {/* Children column */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -142,14 +147,14 @@ const AIUnderstanding = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: i * 0.15 }}
                           style={{
-                            padding: '0.4rem 0.85rem',
-                            border: `1px solid var(--border-color)`,
+                            padding: '0.45rem 0.85rem',
+                            border: `1px solid rgba(255, 255, 255, 0.12)`,
                             borderLeft: `3px solid ${node.color}`,
                             borderRadius: '4px',
                             fontSize: '0.8rem',
-                            fontWeight: 600,
-                            color: 'var(--text-primary)',
-                            backgroundColor: 'var(--bg-surface)'
+                            fontWeight: 700,
+                            color: '#ffffff',
+                            backgroundColor: 'rgba(21, 28, 45, 0.6)'
                           }}
                         >
                           {node.label}

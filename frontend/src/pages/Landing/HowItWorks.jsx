@@ -48,10 +48,10 @@ const HowItWorks = () => {
       // Step 1: Capture (Isolated, scattered nodes, no lines)
       return {
         nodes: [
-          { ...baseNodes[0], x: 70, y: 70, color: 'var(--text-dark-secondary)' },
-          { ...baseNodes[1], x: 310, y: 80, color: 'var(--text-dark-secondary)' },
-          { ...baseNodes[2], x: 90, y: 220, color: 'var(--text-dark-secondary)' },
-          { ...baseNodes[3], x: 290, y: 230, color: 'var(--text-dark-secondary)' }
+          { ...baseNodes[0], x: 70, y: 70, color: 'var(--text-muted)' },
+          { ...baseNodes[1], x: 310, y: 80, color: 'var(--text-muted)' },
+          { ...baseNodes[2], x: 90, y: 220, color: 'var(--text-muted)' },
+          { ...baseNodes[3], x: 290, y: 230, color: 'var(--text-muted)' }
         ],
         links: []
       };
@@ -60,9 +60,9 @@ const HowItWorks = () => {
       return {
         nodes: [
           { ...baseNodes[0], x: 120, y: 90, color: 'var(--accent-indigo)' },
-          { ...baseNodes[1], x: 260, y: 90, color: '#ffffff' },
+          { ...baseNodes[1], x: 260, y: 90, color: 'var(--accent-pink)' },
           { ...baseNodes[2], x: 100, y: 210, color: 'var(--accent-blue)' },
-          { ...baseNodes[3], x: 280, y: 210, color: 'var(--accent-cyan)' }
+          { ...baseNodes[3], x: 280, y: 210, color: 'var(--accent-violet)' }
         ],
         links: []
       };
@@ -71,9 +71,9 @@ const HowItWorks = () => {
       return {
         nodes: [
           { ...baseNodes[0], x: 120, y: 90, color: 'var(--accent-indigo)' },
-          { ...baseNodes[1], x: 260, y: 90, color: '#ffffff' },
+          { ...baseNodes[1], x: 260, y: 90, color: 'var(--accent-pink)' },
           { ...baseNodes[2], x: 100, y: 210, color: 'var(--accent-blue)' },
-          { ...baseNodes[3], x: 280, y: 210, color: 'var(--accent-cyan)' }
+          { ...baseNodes[3], x: 280, y: 210, color: 'var(--accent-violet)' }
         ],
         links: [
           { s: 'n1', t: 'n2' },
@@ -88,16 +88,16 @@ const HowItWorks = () => {
   const currentGraph = getGraphDataForStep(activeStep);
 
   return (
-    <section id="how-it-works" className="dark-section" style={{ padding: '8rem 0', overflow: 'hidden', position: 'relative' }}>
+    <section id="how-it-works" className="light-section" style={{ padding: '8rem 0', overflow: 'hidden', position: 'relative' }}>
       <div className="container">
         
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '5.5rem' }}>
-          <span className="text-label" style={{ marginBottom: '1rem', display: 'inline-block' }}>Visual Journey</span>
-          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-dark-primary)', marginBottom: '1.25rem' }}>
+          <span className="text-label" style={{ color: 'var(--accent-indigo)', marginBottom: '1rem', display: 'inline-block', textShadow: 'none' }}>Visual Journey</span>
+          <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1.25rem' }}>
             How it works.
           </h2>
-          <p style={{ color: 'var(--text-dark-secondary)', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
             A self-structuring semantic database built in four progressive steps.
           </p>
         </div>
@@ -119,22 +119,22 @@ const HowItWorks = () => {
                     display: 'flex',
                     gap: '1.5rem',
                     cursor: 'pointer',
-                    opacity: isActive ? 1 : isPast ? 0.6 : 0.35,
-                    transition: 'opacity 0.4s ease',
-                    borderLeft: isActive ? '2px solid var(--accent-cyan)' : '2px solid transparent',
-                    paddingLeft: '1.25rem',
-                    marginLeft: '-1.25rem'
+                    opacity: isActive ? 1 : isPast ? 0.65 : 0.35,
+                    transition: 'all 0.3s ease',
+                    borderLeft: isActive ? '3.5px solid var(--accent-indigo)' : '3.5px solid transparent',
+                    paddingLeft: '1.5rem',
+                    marginLeft: '-1.5rem'
                   }}
                 >
                   {/* Step Num */}
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: isActive ? 'var(--accent-cyan)' : 'var(--text-dark-secondary)' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: isActive ? 'var(--accent-indigo)' : 'var(--text-muted)' }}>
                     {step.num}
                   </div>
                   
                   {/* Content */}
                   <div>
-                    <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: '0.4rem' }}>{step.title}</h3>
-                    <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>{step.desc}</p>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>{step.title}</h3>
+                    <p style={{ color: isActive ? 'var(--text-secondary)' : 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>{step.desc}</p>
                   </div>
                 </div>
               );
@@ -143,11 +143,11 @@ const HowItWorks = () => {
 
           {/* Right Column Graph Visualization Canvas */}
           <div
+            className="minimal-card"
             style={{
-              height: '320px',
-              backgroundColor: 'rgba(28,28,28,0.5)',
-              border: '1px solid var(--border-dark-color)',
-              borderRadius: '8px',
+              height: '340px',
+              backgroundImage: 'linear-gradient(rgba(79, 70, 229, 0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 70, 229, 0.015) 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
               position: 'relative',
               overflow: 'hidden',
               display: 'flex',
@@ -156,7 +156,7 @@ const HowItWorks = () => {
             }}
           >
             {/* Step label on canvas */}
-            <span style={{ position: 'absolute', top: '1rem', left: '1rem', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent-cyan)' }}>
+            <span style={{ position: 'absolute', top: '1rem', left: '1rem', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--accent-indigo)', letterSpacing: '0.05em' }}>
               Step {steps[activeStep].num}: {steps[activeStep].title}
             </span>
 
@@ -174,9 +174,9 @@ const HowItWorks = () => {
                     y1={s.y}
                     x2={t.x}
                     y2={t.y}
-                    stroke="var(--accent-cyan)"
-                    strokeWidth="1.5"
-                    opacity={activeStep === 3 ? 0.6 : 0.25}
+                    stroke="var(--accent-indigo)"
+                    strokeWidth="2"
+                    opacity={activeStep === 3 ? 0.8 : 0.35}
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: 1 }}
                     transition={{ duration: 0.8 }}
@@ -195,8 +195,8 @@ const HowItWorks = () => {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ type: 'spring', stiffness: 120, damping: 14 }}
                   >
-                    <circle cx={node.x} cy={node.y} r={6} fill="var(--bg-dark-primary)" stroke={node.color} strokeWidth="2" />
-                    <text x={node.x} y={node.y + 16} fill="var(--text-dark-primary)" fontSize="8.5" fontWeight="600" textAnchor="middle">
+                    <circle cx={node.x} cy={node.y} r={6.5} fill="var(--bg-surface)" stroke={node.color} strokeWidth="2.5" />
+                    <text x={node.x} y={node.y + 18} fill="var(--text-primary)" fontSize="9.5" fontWeight="700" textAnchor="middle">
                       {node.label}
                     </text>
                   </motion.g>
