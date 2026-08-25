@@ -6,6 +6,7 @@ import { getPngIcon } from '../../utils/pngIcons';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const navigate = useNavigate();
   const logoPng = getPngIcon('logo');
 
@@ -16,6 +17,25 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const checkLogin = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+    window.addEventListener('storage', checkLogin);
+    const interval = setInterval(checkLogin, 1000);
+    return () => {
+      window.removeEventListener('storage', checkLogin);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    setIsMobileMenuOpen(false);
+    navigate('/');
+  };
 
   const scrollToSection = (id) => {
     setIsMobileMenuOpen(false);
@@ -56,25 +76,66 @@ const Navbar = () => {
           margin: '0 auto',
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           borderRadius: '10px',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 4px 15px rgba(15, 23, 42, 0.05)',
         }}
       >
         {/* Brand */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)' }}>
-          {logoPng && <img src={logoPng} alt="Logo" style={{ width: 24, height: 24 }} />}
-          <span>KnowledgeGraph AI</span>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+          {logoPng && <img src={logoPng} alt="Logo" style={{ width: 26, height: 26, filter: 'drop-shadow(0 0 8px var(--accent-indigo))' }} />}
+          <span style={{ letterSpacing: '-0.02em' }}>
+            KnowledgeGraph <span style={{ color: 'var(--accent-indigo)' }}>AI</span>
+          </span>
         </Link>
 
         {/* Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }} className="desktop-menu">
-          <button onClick={() => scrollToSection('features')} style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500 }}>Product</button>
-          <button onClick={() => scrollToSection('how-it-works')} style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500 }}>How it Works</button>
-          <button onClick={() => scrollToSection('ai-capabilities')} style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500 }}>AI Insights</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2.25rem' }} className="desktop-menu">
+          {['features', 'how-it-works', 'ai-capabilities'].map((sec) => (
+            <motion.button
+              key={sec}
+              onClick={() => scrollToSection(sec)}
+              whileHover={{ color: 'var(--accent-indigo)', y: -1 }}
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                fontWeight: 650,
+                transition: 'color 0.2s',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              {sec === 'features' ? 'Product' : sec === 'how-it-works' ? 'How it Works' : 'AI Insights'}
+            </motion.button>
+          ))}
         </div>
 
         {/* Action buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }} className="desktop-actions">
-          <Link to="/login" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500 }}>Login</Link>
-          <Link to="/register" className="btn btn-primary" style={{ padding: '0.45rem 1.15rem', fontSize: '0.8rem' }}>Get Started</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }} className="desktop-actions">
+          {isLoggedIn ? (
+            <motion.button
+              onClick={handleLogout}
+              whileHover={{ color: 'var(--accent-indigo)' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                fontWeight: 650,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              Logout
+            </motion.button>
+          ) : (
+            <>
+              <motion.div whileHover={{ color: 'var(--accent-indigo)' }}>
+                <Link to="/login" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 650, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Login</Link>
+              </motion.div>
+              <Link to="/register" className="btn btn-primary" style={{ padding: '0.55rem 1.35rem', fontSize: '0.8rem' }}>Get Started</Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle Button */}
@@ -84,16 +145,16 @@ const Navbar = () => {
             display: 'none',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            width: '20px',
-            height: '14px',
+            width: '22px',
+            height: '15px',
             background: 'none',
             cursor: 'pointer',
           }}
           className="mobile-toggle"
         >
-          <span style={{ width: '100%', height: '1.5px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
-          <span style={{ width: '100%', height: '1.5px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
-          <span style={{ width: '100%', height: '1.5px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
+          <span style={{ width: '100%', height: '2px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
+          <span style={{ width: '100%', height: '2px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
+          <span style={{ width: '100%', height: '2px', backgroundColor: 'var(--text-primary)', borderRadius: '1px' }} />
         </button>
       </div>
 
@@ -117,16 +178,22 @@ const Navbar = () => {
               padding: '1.5rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+              gap: '1.25rem',
+              boxShadow: '0 10px 30px rgba(0,243,255,0.15)',
             }}
           >
-            <button onClick={() => scrollToSection('features')} style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500, textAlign: 'left' }}>Product</button>
-            <button onClick={() => scrollToSection('how-it-works')} style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500, textAlign: 'left' }}>How it Works</button>
-            <button onClick={() => scrollToSection('ai-capabilities')} style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500, textAlign: 'left' }}>AI Insights</button>
+            <button onClick={() => scrollToSection('features')} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600, textAlign: 'left' }}>Product</button>
+            <button onClick={() => scrollToSection('how-it-works')} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600, textAlign: 'left' }}>How it Works</button>
+            <button onClick={() => scrollToSection('ai-capabilities')} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600, textAlign: 'left' }}>AI Insights</button>
             <div style={{ height: '1px', backgroundColor: 'var(--border-color)' }} />
-            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500 }}>Login</Link>
-            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-primary" style={{ width: '100%' }}>Get Started</Link>
+            {isLoggedIn ? (
+              <button onClick={handleLogout} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600, textAlign: 'left', background: 'none', border: 'none', padding: 0 }}>Logout</button>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600 }}>Login</Link>
+                <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-primary" style={{ width: '100%' }}>Get Started</Link>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

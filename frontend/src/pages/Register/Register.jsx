@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getPngIcon } from '../../utils/pngIcons';
 import KnowledgeGraphPanel from '../../components/Auth/KnowledgeGraphPanel';
 import KnowledgeGraph from '../../components/Auth/KnowledgeGraph';
+import { authService } from '../../services/api';
+import { signInWithGoogle } from '../../firebase';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -54,19 +56,27 @@ const Register = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (handleValidation()) {
       setIsLoading(true);
-      // Simulate API loading
-      setTimeout(() => {
+      setErrors({});
+      try {
+        const res = await authService.register(name, email, password);
+        if (res.success) {
+          setIsLoading(false);
+          setIsSuccess(true);
+          setTimeout(() => {
+            navigate('/');
+          }, 1600);
+        } else {
+          setIsLoading(false);
+          setErrors({ form: res.message || 'Registration failed.' });
+        }
+      } catch (err) {
         setIsLoading(false);
-        setIsSuccess(true);
-        // Staggered transition before navigating to home
-        setTimeout(() => {
-          navigate('/');
-        }, 1600);
-      }, 1500);
+        setErrors({ form: 'Server connection error. Please try again.' });
+      }
     }
   };
 
@@ -465,6 +475,19 @@ const Register = () => {
                     </AnimatePresence>
                   </motion.div>
 
+                  <AnimatePresence>
+                    {errors.form && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        style={{ color: '#EF4444', fontSize: '0.8rem', textAlign: 'center', marginTop: '0.25rem' }}
+                      >
+                        {errors.form}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Primary Submit Button */}
                   <motion.div variants={elementVariants} style={{ marginTop: '0.25rem' }}>
                     <motion.button
@@ -550,13 +573,29 @@ const Register = () => {
                 <motion.div variants={elementVariants}>
                   <motion.button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       setIsLoading(true);
-                      setTimeout(() => {
+                      setErrors({});
+                      try {
+                        const googleRes = await signInWithGoogle();
+                        if (googleRes.success) {
+                          const apiRes = await authService.googleLogin(googleRes.idToken, googleRes.user);
+                          if (apiRes.success) {
+                            setIsLoading(false);
+                            setIsSuccess(true);
+                            setTimeout(() => navigate('/'), 1600);
+                          } else {
+                            setIsLoading(false);
+                            setErrors({ api: apiRes.message || 'Google login failed on backend.' });
+                          }
+                        } else {
+                          setIsLoading(false);
+                          setErrors({ google: googleRes.message || 'Google Sign-in failed.' });
+                        }
+                      } catch (error) {
                         setIsLoading(false);
-                        setIsSuccess(true);
-                        setTimeout(() => navigate('/'), 1600);
-                      }, 1000);
+                        setErrors({ general: 'An unexpected authentication error occurred.' });
+                      }
                     }}
                     whileHover={{ backgroundColor: 'rgba(17, 17, 17, 0.03)' }}
                     whileTap={{ scale: 0.99 }}
@@ -580,6 +619,18 @@ const Register = () => {
                     )}
                     <span>Continue with Google</span>
                   </motion.button>
+                  <AnimatePresence>
+                    {(errors.google || errors.api || errors.general) && (
+                      <motion.span
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        style={{ display: 'block', color: '#EF4444', fontSize: '0.8rem', marginTop: '0.5rem', textAlign: 'center' }}
+                      >
+                        {errors.google || errors.api || errors.general}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               </motion.div>
             )}

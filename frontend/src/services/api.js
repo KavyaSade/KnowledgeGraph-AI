@@ -48,6 +48,30 @@ export const authService = {
     }
   },
 
+  // Google Sign-In
+  googleLogin: async (idToken, userDetails) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: userDetails.name, 
+          email: userDetails.email, 
+          uid: userDetails.uid,
+          idToken
+        }),
+      });
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      return data;
+    } catch (error) {
+      console.error('Google login API connection failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
   // Get current user profile
   getMe: async () => {
     try {
