@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { getGraphData, createNode, createLink, searchGraph } = require('../controllers/graphController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/', getGraphData);
-router.post('/nodes', createNode);
-router.post('/links', createLink);
-router.get('/search', searchGraph);
+router.get('/', protect, getGraphData);
+router.post('/nodes', protect, createNode);
+router.post('/links', protect, createLink);
+router.get('/search', protect, searchGraph);
 
 module.exports = router;
