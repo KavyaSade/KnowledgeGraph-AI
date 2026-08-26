@@ -1,46 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Hero from './Hero';
-import ScatteredKnowledge from './ScatteredKnowledge';
-import DarkGraphInsights from './DarkGraphInsights';
-import AIUnderstanding from './AIUnderstanding';
-import NLSearch from './NLSearch';
-import Features from './Features';
 import HowItWorks from './HowItWorks';
-import CTA from './CTA';
+import Features from './Features';
+import AboutUs from './AboutUs';
+import ContactUs from './ContactUs';
+import FAQ from './FAQ';
 import Footer from '../../components/Layout/Footer';
 
 const Landing = () => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%', backgroundColor: 'var(--bg-primary)' }}>
-      {/* 1. Header (Translucent Light Inset) */}
-      <Navbar />
+  const navigate = useNavigate();
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-      {/* 2. Hero (Light Section) */}
+  // Redirect to dashboard if logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
+  const toggleTheme = () => {
+    setIsTransitioning(true);
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 350);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  return (
+    <div 
+      className={`landing-root theme-${theme} ${isTransitioning ? 'theme-transition' : ''}`}
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh', 
+        width: '100%', 
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
+      }}
+    >
+      {/* Navbar */}
+      <Navbar theme={theme} toggleTheme={toggleTheme} />
+
+      {/* 1. Hero */}
       <Hero />
 
-      {/* 3. Scattered Knowledge (Light Section) */}
-      <ScatteredKnowledge />
-
-      {/* 4. Dark Graph Insights (Dark Section) */}
-      <DarkGraphInsights />
-
-      {/* 5. AI Understanding Pipeline (Light Section) */}
-      <AIUnderstanding />
-
-      {/* 6. Natural Language Search (Dark Section) */}
-      <NLSearch />
-
-      {/* 7. Asymmetric Features Grid (Light Section) */}
+      {/* 2. Features */}
       <Features />
 
-      {/* 8. Visual Stepped Timeline Journey (Dark Section) */}
+      {/* 3. How It Works */}
       <HowItWorks />
 
-      {/* 9. Final Call-to-Action (Dark Section) */}
-      <CTA />
+      {/* 4. About Us */}
+      <AboutUs />
 
-      {/* 10. Minimal Editorial Footer (Light Section) */}
+      {/* 5. FAQ */}
+      <FAQ />
+
+      {/* 6. Contact Us */}
+      <ContactUs />
+
+      {/* Footer */}
       <Footer />
     </div>
   );

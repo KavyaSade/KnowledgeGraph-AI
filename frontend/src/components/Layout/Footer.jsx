@@ -27,25 +27,26 @@ const Footer = () => {
           </div>
  
            {/* Links Columns */}
-           <div style={{ display: 'flex', gap: '4.5rem', flexWrap: 'wrap' }} className="footer-links-wrap">
-             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-               <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Navigation</span>
-               <Link to="/#features" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Product</Link>
-               <Link to="/#how-it-works" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>How It Works</Link>
-             </div>
-             
-             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-               <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Resources</span>
-               <a href="#" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Docs</a>
-               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>GitHub</a>
-             </div>
- 
-             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-               <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Account</span>
-               <Link to="/login" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Login</Link>
-               <Link to="/register" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Get Started</Link>
-             </div>
-           </div>
+            <div style={{ display: 'flex', gap: '4.5rem', flexWrap: 'wrap' }} className="footer-links-wrap">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Navigation</span>
+                <Link to="/#features" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Features</Link>
+                <Link to="/#how-it-works" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>How It Works</Link>
+                <Link to="/#about-us" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>About Us</Link>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Support</span>
+                <Link to="/#faq" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>FAQ</Link>
+                <Link to="/#contact-us" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Contact Us</Link>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Account</span>
+                <Link to="/login" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Login</Link>
+                <Link to="/register" className="foot-link" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }}>Get Started</Link>
+              </div>
+            </div>
  
          </div>
  
