@@ -21,6 +21,20 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false, // Don't returns password in query results by default
   },
+  phone: {
+    type: String,
+    default: '',
+  },
+  avatar: {
+    type: String,
+    default: null,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpire: {
+    type: Date,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

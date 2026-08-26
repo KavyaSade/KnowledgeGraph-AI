@@ -75,4 +75,76 @@
   }
 }
 
+/* Dark Theme Global Overrides */
+.theme-dark {
+  --bg-primary: #080A10;       
+  --bg-secondary: #0D121F;     
+  --bg-surface: #121829;       
+  --bg-card: #172037;          
+  
+  --text-primary: #FFFFFF;     
+  --text-secondary: #E2E8F0;  
+  --text-muted: #94A3B8;       
+  --border-color: rgba(0, 243, 255, 0.2); 
+  --border-hover: rgba(0, 243, 255, 0.45);
+
+  --accent-cyan: #00F3FF;
+  --accent-blue: #3B82F6;
+  --accent-indigo: #6366F1;
+  --accent-violet: #D946EF;
+  --accent-pink: #FF007A;
+  --accent-emerald: #10B981;
+  --accent-amber: #F59E0B;
+
+  --accent-glow: rgba(0, 243, 255, 0.12);
+
+  --glass-bg: rgba(13, 18, 31, 0.85);
+  --glass-border: rgba(0, 243, 255, 0.2);
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 243, 255, 0.05);
+}
+
+/* Redefining light-section background inside dark theme context */
+.theme-dark .light-section {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(217, 70, 239, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 45%),
+    linear-gradient(rgba(0, 243, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+}
+
+.theme-dark .nav-inset-panel {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 243, 255, 0.05);
+}
+
+/* Accent Treatments in Dark mode */
+.theme-dark .accent-highlight {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+}
+
+/* Clean Dashboard Dark Mode Adaptations */
+.theme-dark .dashboard-sidebar {
+  border-right: 1px solid rgba(0, 243, 255, 0.2) !important;
+}
+
+.theme-dark .dashboard-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Theme color transition rules */
+.theme-transition,
+.theme-transition * {
+  transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+
 
