@@ -1,35 +1,40 @@
-/**
- * Graph Controller (Mock APIs for frontend connection)
- */
+const GraphNode = require('../models/GraphNode');
+const Link = require('../models/Link');
 
-// Initial mock data for the personal knowledge graph
-let mockNodes = [
-  { id: '1', type: 'project', title: 'Machine Learning Model', content: 'Developing a neural network for prediction.', tags: ['ML', 'Python'] },
-  { id: '2', type: 'person', title: 'Jane Smith', content: 'Data scientist collaborator.', tags: ['Team', 'AI'] },
-  { id: '3', type: 'note', title: 'Neural Net Architecture', content: 'Using ResNet-50 as backbone.', tags: ['Deep Learning', 'ResNet'] },
-  { id: '4', type: 'document', title: 'Project Proposal.pdf', content: 'Q3 project outline and deliverables.', tags: ['Planning', 'PDF'] },
-  { id: '5', type: 'topic', title: 'Artificial Intelligence', content: 'Broad category of intelligent systems.', tags: ['Core'] },
-  { id: '6', type: 'bookmark', title: 'Mongoose Documentation', content: 'Useful ODM guide.', tags: ['Docs', 'MongoDB'], metadata: { url: 'https://mongoosejs.com/' } },
-  { id: '7', type: 'idea', title: 'Knowledge Graph Integration', content: 'Integrate graph representation with notes.', tags: ['Idea', 'Brainstorm'] },
-];
-
-let mockLinks = [
-  { id: 'l1', source: '1', target: '2', label: 'collaborator_on' },
-  { id: 'l2', source: '3', target: '1', label: 'implemented_in' },
-  { id: 'l3', source: '4', target: '1', label: 'defines' },
-  { id: 'l4', source: '1', target: '5', label: 'subfield_of' },
-  { id: 'l5', source: '2', target: '5', label: 'specializes_in' },
-  { id: 'l6', source: '7', target: '1', label: 'feature_of' },
-  { id: 'l7', source: '3', target: '7', label: 'inspires' },
-];
-
-// Get complete knowledge graph data
+// Get complete knowledge graph data for the logged-in user
 exports.getGraphData = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    nodes: mockNodes,
-    links: mockLinks,
-  });
+  try {
+    const nodes = await GraphNode.find({ user: req.user.id });
+    const links = await Link.find({ user: req.user.id });
+
+    const formattedNodes = nodes.map(node => ({
+      id: node._id.toString(),
+      type: node.type,
+      title: node.title,
+      content: node.content,
+      tags: node.tags,
+      metadata: node.metadata || {},
+      createdAt: node.createdAt
+    }));
+
+    const formattedLinks = links.map(link => ({
+      id: link._id.toString(),
+      source: link.source.toString(),
+      target: link.target.toString(),
+      label: link.label,
+      strength: link.strength,
+      createdAt: link.createdAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      nodes: formattedNodes,
+      links: formattedLinks,
+    });
+  } catch (err) {
+    console.error('Error fetching graph data:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching graph data' });
+  }
 };
 
 // Create a new node in the graph
@@ -40,26 +45,36 @@ exports.createNode = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Please provide type and title' });
   }
 
-  const newNode = {
-    id: String(mockNodes.length + 1),
-    type,
-    title,
-    content: content || '',
-    tags: tags || [],
-    metadata: metadata || {},
-    createdAt: new Date(),
-  };
+  try {
+    const node = await GraphNode.create({
+      user: req.user.id,
+      type,
+      title,
+      content: content || '',
+      tags: tags || [],
+      metadata: metadata || {}
+    });
 
-  mockNodes.push(newNode);
-
-  res.status(201).json({
-    success: true,
-    message: 'Node created successfully (Mock API)',
-    node: newNode,
-  });
+    res.status(201).json({
+      success: true,
+      message: 'Node created successfully',
+      node: {
+        id: node._id.toString(),
+        type: node.type,
+        title: node.title,
+        content: node.content,
+        tags: node.tags,
+        metadata: node.metadata,
+        createdAt: node.createdAt
+      }
+    });
+  } catch (err) {
+    console.error('Error creating node:', err);
+    res.status(500).json({ success: false, message: 'Server error creating node' });
+  }
 };
 
-//Create a new link (connection) between nodes
+// Create a new link (connection) between nodes
 exports.createLink = async (req, res) => {
   const { source, target, label } = req.body;
 
@@ -67,26 +82,76 @@ exports.createLink = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Please provide source and target nodes' });
   }
 
-  const newLink = {
-    id: `l${mockLinks.length + 1}`,
-    source,
-    target,
-    label: label || 'connected_to',
-    createdAt: new Date(),
-  };
+  try {
+    // Verify source and target nodes exist and belong to the user
+    const sourceNode = await GraphNode.findOne({ _id: source, user: req.user.id });
+    const targetNode = await GraphNode.findOne({ _id: target, user: req.user.id });
 
-  mockLinks.push(newLink);
+    if (!sourceNode || !targetNode) {
+      return res.status(404).json({ success: false, message: 'Source or target node not found' });
+    }
 
-  res.status(201).json({
-    success: true,
-    message: 'Link created successfully (Mock API)',
-    link: newLink,
-  });
+    // Check if the link already exists
+    let link = await Link.findOne({
+      user: req.user.id,
+      source,
+      target,
+      label: label || 'connected_to'
+    });
+
+    if (link) {
+      return res.status(400).json({ success: false, message: 'Link already exists between these nodes' });
+    }
+
+    link = await Link.create({
+      user: req.user.id,
+      source,
+      target,
+      label: label || 'connected_to'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Link created successfully',
+      link: {
+        id: link._id.toString(),
+        source: link.source.toString(),
+        target: link.target.toString(),
+        label: link.label,
+        createdAt: link.createdAt
+      }
+    });
+  } catch (err) {
+    console.error('Error creating link:', err);
+    res.status(500).json({ success: false, message: 'Server error creating link' });
+  }
 };
 
-// Natural language search 
-// GET /api/graph/search
+// Delete a node and its connections
+exports.deleteNode = async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const node = await GraphNode.findOneAndDelete({ _id: id, user: req.user.id });
+
+    if (!node) {
+      return res.status(404).json({ success: false, message: 'Node not found or unauthorized' });
+    }
+
+    // Also delete any links associated with this node
+    await Link.deleteMany({
+      user: req.user.id,
+      $or: [{ source: id }, { target: id }]
+    });
+
+    res.status(200).json({ success: true, message: 'Node and connections deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting node:', err);
+    res.status(500).json({ success: false, message: 'Server error deleting node' });
+  }
+};
+
+// Natural language search
 exports.searchGraph = async (req, res) => {
   const { q } = req.query;
 
@@ -94,28 +159,57 @@ exports.searchGraph = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Please provide search query' });
   }
 
-  const query = q.toLowerCase();
-  
-  // Filter nodes matching the query in title, content, or tags
-  const matchedNodes = mockNodes.filter(
-    (node) =>
-      node.title.toLowerCase().includes(query) ||
-      node.content.toLowerCase().includes(query) ||
-      node.tags.some((tag) => tag.toLowerCase().includes(query))
-  );
+  try {
+    // Find all nodes matching query in title, content, or tags
+    const matchedNodes = await GraphNode.find({
+      user: req.user.id,
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { content: { $regex: q, $options: 'i' } },
+        { tags: { $in: [new RegExp(q, 'i')] } }
+      ]
+    });
 
-  // Find links connecting the matched nodes
-  const matchedNodeIds = matchedNodes.map((n) => n.id);
-  const matchedLinks = mockLinks.filter(
-    (link) => matchedNodeIds.includes(link.source) || matchedNodeIds.includes(link.target)
-  );
+    const formattedNodes = matchedNodes.map(node => ({
+      id: node._id.toString(),
+      type: node.type,
+      title: node.title,
+      content: node.content,
+      tags: node.tags,
+      metadata: node.metadata || {},
+      createdAt: node.createdAt
+    }));
 
-  res.status(200).json({
-    success: true,
-    query: q,
-    results: {
-      nodes: matchedNodes,
-      links: matchedLinks,
-    },
-  });
+    const matchedNodeIds = formattedNodes.map(n => n.id);
+
+    // Find links that connect the matched nodes
+    const matchedLinks = await Link.find({
+      user: req.user.id,
+      $or: [
+        { source: { $in: matchedNodeIds } },
+        { target: { $in: matchedNodeIds } }
+      ]
+    });
+
+    const formattedLinks = matchedLinks.map(link => ({
+      id: link._id.toString(),
+      source: link.source.toString(),
+      target: link.target.toString(),
+      label: link.label,
+      strength: link.strength,
+      createdAt: link.createdAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      query: q,
+      results: {
+        nodes: formattedNodes,
+        links: formattedLinks,
+      },
+    });
+  } catch (err) {
+    console.error('Search graph error:', err);
+    res.status(500).json({ success: false, message: 'Server error during graph search' });
+  }
 };

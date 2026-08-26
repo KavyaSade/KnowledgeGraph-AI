@@ -89,6 +89,51 @@ export const authService = {
   // Logout
   logout: () => {
     localStorage.removeItem('token');
+  },
+
+  // Forgot Password
+  forgotPassword: async (email) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Forgot password request failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Reset Password
+  resetPassword: async (token, password) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Reset password request failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Update Profile Details
+  updateProfile: async (name, email, phone, avatar) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/update-profile`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ name, email, phone, avatar }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Profile update request failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
   }
 };
 
@@ -133,6 +178,20 @@ export const graphService = {
       return await response.json();
     } catch (error) {
       console.error('Linking nodes failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Delete a graph node
+  deleteNode: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/nodes/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Deleting node failed:', error);
       return { success: false, message: 'Server connection error' };
     }
   },

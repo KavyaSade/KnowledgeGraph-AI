@@ -7,6 +7,13 @@ import KnowledgeGraph from '../../components/Auth/KnowledgeGraph';
 import { authService } from '../../services/api';
 import { signInWithGoogle } from '../../firebase';
 
+// Loads canvas-rendered PNG icons
+const googlePng = getPngIcon('google');
+const eyePng = getPngIcon('eye');
+const eyeOffPng = getPngIcon('eye-off');
+const arrowRightPng = getPngIcon('arrow-right');
+const logoNodePng = getPngIcon('logo-node');
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,13 +25,6 @@ const Login = () => {
   const [isBtnHovered, setIsBtnHovered] = useState(false);
   
   const navigate = useNavigate();
-
-  // Load canvas-rendered PNG icons
-  const googlePng = getPngIcon('google');
-  const eyePng = getPngIcon('eye');
-  const eyeOffPng = getPngIcon('eye-off');
-  const arrowRightPng = getPngIcon('arrow-right');
-  const logoNodePng = getPngIcon('logo-node');
 
   const handleValidation = () => {
     let tempErrors = {};
@@ -52,9 +52,7 @@ const Login = () => {
         if (res.success) {
           setIsLoading(false);
           setIsSuccess(true);
-          setTimeout(() => {
-            navigate('/');
-          }, 1600);
+          navigate('/dashboard');
         } else {
           setIsLoading(false);
           setErrors({ form: res.message || 'Invalid email or password.' });
@@ -385,8 +383,8 @@ const Login = () => {
                       <span style={{ color: '#666666' }}>Remember me</span>
                     </label>
 
-                    <a
-                      href="#"
+                    <Link
+                      to="/forgot-password"
                       style={{
                         color: '#666666',
                         fontWeight: 400,
@@ -397,7 +395,7 @@ const Login = () => {
                       onMouseLeave={(e) => e.target.style.color = '#666666'}
                     >
                       Forgot password?
-                    </a>
+                    </Link>
                   </motion.div>
 
                   <AnimatePresence>
@@ -509,7 +507,7 @@ const Login = () => {
                           if (apiRes.success) {
                             setIsLoading(false);
                             setIsSuccess(true);
-                            setTimeout(() => navigate('/'), 1600);
+                            navigate('/dashboard');
                           } else {
                             setIsLoading(false);
                             setErrors({ api: apiRes.message || 'Google login failed on backend.' });

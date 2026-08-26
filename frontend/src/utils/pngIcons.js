@@ -302,6 +302,319 @@ const drawIcon = (type, ctx, w, h) => {
 
     ctx.restore();
   }
+  else if (type === 'sun') {
+    // Sun icon for light theme toggle
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#D97706';
+    ctx.strokeStyle = '#D97706';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.5, w * 0.18, 0, Math.PI * 2);
+    ctx.stroke();
+
+    const numRays = 8;
+    const rStart = w * 0.28;
+    const rEnd = w * 0.41;
+    for (let i = 0; i < numRays; i++) {
+      const angle = (i * Math.PI * 2) / numRays;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5 + rStart * cos, h * 0.5 + rStart * sin);
+      ctx.lineTo(w * 0.5 + rEnd * cos, h * 0.5 + rEnd * sin);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  else if (type === 'moon') {
+    //moon icon for dark theme toggle
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#6366F1';
+    ctx.strokeStyle = '#6366F1';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = '#6366F1';
+
+    ctx.beginPath();
+    ctx.arc(w * 0.45, h * 0.5, w * 0.25, -Math.PI * 0.4, Math.PI * 0.6);
+    ctx.arc(w * 0.55, h * 0.5, w * 0.25, Math.PI * 0.6, -Math.PI * 0.4, true);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'capture') {
+    //Plus icon for capturing knowledge
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#4F46E5';
+    ctx.strokeStyle = '#4F46E5';
+    ctx.lineWidth = w * 0.08;
+    ctx.lineCap = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.25);
+    ctx.lineTo(w * 0.5, h * 0.75);
+    ctx.moveTo(w * 0.25, h * 0.5);
+    ctx.lineTo(w * 0.75, h * 0.5);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'resource') {
+    //Document icon for managing resources
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#059669';
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.3, h * 0.25);
+    ctx.lineTo(w * 0.55, h * 0.25);
+    ctx.lineTo(w * 0.7, h * 0.4);
+    ctx.lineTo(w * 0.7, h * 0.75);
+    ctx.lineTo(w * 0.3, h * 0.75);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.55, h * 0.25);
+    ctx.lineTo(w * 0.55, h * 0.4);
+    ctx.lineTo(w * 0.7, h * 0.4);
+    ctx.stroke();
+
+    ctx.lineWidth = w * 0.05;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.4, h * 0.52);
+    ctx.lineTo(w * 0.6, h * 0.52);
+    ctx.moveTo(w * 0.4, h * 0.64);
+    ctx.lineTo(w * 0.55, h * 0.64);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'insight') {
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#DB2777';
+    ctx.strokeStyle = '#DB2777';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.4, w * 0.22, -Math.PI * 0.2, -Math.PI * 0.8, true);
+    ctx.lineTo(w * 0.42, h * 0.68);
+    ctx.lineTo(w * 0.58, h * 0.68);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.44, h * 0.74);
+    ctx.lineTo(w * 0.56, h * 0.74);
+    ctx.moveTo(w * 0.46, h * 0.8);
+    ctx.lineTo(w * 0.54, h * 0.8);
+    ctx.stroke();
+
+    ctx.lineWidth = w * 0.05;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.47, h * 0.48);
+    ctx.lineTo(w * 0.49, h * 0.4);
+    ctx.lineTo(w * 0.51, h * 0.4);
+    ctx.lineTo(w * 0.53, h * 0.48);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'trash') {
+    ctx.save();
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = '#EF4444';
+    ctx.strokeStyle = '#EF4444';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.25, h * 0.3);
+    ctx.lineTo(w * 0.75, h * 0.3);
+    ctx.moveTo(w * 0.4, h * 0.3);
+    ctx.lineTo(w * 0.4, h * 0.22);
+    ctx.lineTo(w * 0.6, h * 0.22);
+    ctx.lineTo(w * 0.6, h * 0.3);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.31, h * 0.3);
+    ctx.lineTo(w * 0.35, h * 0.78);
+    ctx.lineTo(w * 0.65, h * 0.78);
+    ctx.lineTo(w * 0.69, h * 0.3);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.46, h * 0.42);
+    ctx.lineTo(w * 0.46, h * 0.68);
+    ctx.moveTo(w * 0.54, h * 0.42);
+    ctx.lineTo(w * 0.54, h * 0.68);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'logout') {
+    ctx.save();
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = '#475569';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.52, h * 0.24);
+    ctx.lineTo(w * 0.26, h * 0.24);
+    ctx.lineTo(w * 0.26, h * 0.76);
+    ctx.lineTo(w * 0.52, h * 0.76);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.42, h * 0.5);
+    ctx.lineTo(w * 0.78, h * 0.5);
+    ctx.lineTo(w * 0.64, h * 0.36);
+    ctx.moveTo(w * 0.78, h * 0.5);
+    ctx.lineTo(w * 0.64, h * 0.64);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'user') {
+    ctx.save();
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = '#4F46E5';
+    ctx.strokeStyle = '#4F46E5';
+    ctx.lineWidth = w * 0.08;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Head
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.38, w * 0.16, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Shoulders
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.82, w * 0.3, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'home') {
+    ctx.save();
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = '#6366F1';
+    ctx.strokeStyle = '#6366F1';
+    ctx.lineWidth = w * 0.08;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.2, h * 0.5);
+    ctx.lineTo(w * 0.5, h * 0.22);
+    ctx.lineTo(w * 0.8, h * 0.5);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.28, h * 0.46);
+    ctx.lineTo(w * 0.28, h * 0.78);
+    ctx.lineTo(w * 0.72, h * 0.78);
+    ctx.lineTo(w * 0.72, h * 0.46);
+    ctx.stroke();
+
+  
+    ctx.beginPath();
+    ctx.moveTo(w * 0.44, h * 0.78);
+    ctx.lineTo(w * 0.44, h * 0.6);
+    ctx.lineTo(w * 0.56, h * 0.6);
+    ctx.lineTo(w * 0.56, h * 0.78);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+  else if (type === 'network') {
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#06B6D4';
+    ctx.strokeStyle = '#06B6D4';
+    ctx.lineWidth = w * 0.05;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const center = { x: w * 0.5, y: h * 0.5 };
+    const orbitA = { x: w * 0.25, y: h * 0.35 };
+    const orbitB = { x: w * 0.75, y: h * 0.35 };
+    const orbitC = { x: w * 0.5, y: h * 0.75 };
+
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(orbitA.x, orbitA.y);
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(orbitB.x, orbitB.y);
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(orbitC.x, orbitC.y);
+    ctx.stroke();
+
+    // Center node
+    ctx.fillStyle = '#6366F1';
+    ctx.shadowColor = '#6366F1';
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, w * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Orbit nodes
+    ctx.fillStyle = '#06B6D4';
+    ctx.shadowColor = '#06B6D4';
+    ctx.beginPath();
+    ctx.arc(orbitA.x, orbitA.y, w * 0.06, 0, Math.PI * 2);
+    ctx.arc(orbitB.x, orbitB.y, w * 0.06, 0, Math.PI * 2);
+    ctx.arc(orbitC.x, orbitC.y, w * 0.06, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+  else if (type === 'brain') {
+    // Elegant brain hemisphere outline representing AI insights
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#EC4899';
+    ctx.strokeStyle = '#EC4899';
+    ctx.lineWidth = w * 0.07;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Left hemisphere outline
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.22);
+    ctx.bezierCurveTo(w * 0.25, h * 0.15, w * 0.18, h * 0.45, w * 0.35, h * 0.58);
+    ctx.bezierCurveTo(w * 0.2, h * 0.72, w * 0.45, h * 0.88, w * 0.5, h * 0.78);
+    ctx.stroke();
+
+    // Right hemisphere outline
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.22);
+    ctx.bezierCurveTo(w * 0.75, h * 0.15, w * 0.82, h * 0.45, w * 0.65, h * 0.58);
+    ctx.bezierCurveTo(w * 0.8, h * 0.72, w * 0.55, h * 0.88, w * 0.5, h * 0.78);
+    ctx.stroke();
+
+    // Central dividing line
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.25);
+    ctx.lineTo(w * 0.5, h * 0.75);
+    ctx.stroke();
+
+    ctx.restore();
+  }
 };
 
 export const getPngIcon = (type) => {

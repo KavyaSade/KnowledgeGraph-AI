@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import { getPngIcon } from '../../utils/pngIcons';
 import KnowledgeGraph from './KnowledgeGraph';
 
+// Fetch logo icon
+const logoNodePng = getPngIcon('logo-node');
+
 const KnowledgeGraphPanel = () => {
-  const logoNodePng = getPngIcon('logo-node');
 
   // Entrance variants for staggered fade-in
   const containerVariants = {

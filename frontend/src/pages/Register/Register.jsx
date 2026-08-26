@@ -7,6 +7,13 @@ import KnowledgeGraph from '../../components/Auth/KnowledgeGraph';
 import { authService } from '../../services/api';
 import { signInWithGoogle } from '../../firebase';
 
+// Loads canvas-rendered PNG icons
+const googlePng = getPngIcon('google');
+const eyePng = getPngIcon('eye');
+const eyeOffPng = getPngIcon('eye-off');
+const arrowRightPng = getPngIcon('arrow-right');
+const logoNodePng = getPngIcon('logo-node');
+
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,13 +27,6 @@ const Register = () => {
   const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const navigate = useNavigate();
-
-  // Load canvas-rendered PNG icons
-  const googlePng = getPngIcon('google');
-  const eyePng = getPngIcon('eye');
-  const eyeOffPng = getPngIcon('eye-off');
-  const arrowRightPng = getPngIcon('arrow-right');
-  const logoNodePng = getPngIcon('logo-node');
 
   const handleValidation = () => {
     let tempErrors = {};
@@ -66,9 +66,7 @@ const Register = () => {
         if (res.success) {
           setIsLoading(false);
           setIsSuccess(true);
-          setTimeout(() => {
-            navigate('/');
-          }, 1600);
+          navigate('/dashboard');
         } else {
           setIsLoading(false);
           setErrors({ form: res.message || 'Registration failed.' });
@@ -583,7 +581,7 @@ const Register = () => {
                           if (apiRes.success) {
                             setIsLoading(false);
                             setIsSuccess(true);
-                            setTimeout(() => navigate('/'), 1600);
+                            navigate('/dashboard');
                           } else {
                             setIsLoading(false);
                             setErrors({ api: apiRes.message || 'Google login failed on backend.' });

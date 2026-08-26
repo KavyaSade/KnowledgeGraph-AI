@@ -30,6 +30,8 @@ const graphNodeSchema = new mongoose.Schema({
     url: String,        // For bookmarks
     author: String,     // For documents or ideas
     color: String,      // Visual styling in the graph
+    docFile: String,    // base64 document file
+    fileName: String,   // name of uploaded document
     position: {         // Graphical positioning if needed
       x: Number,
       y: Number,
