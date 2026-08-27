@@ -5,6 +5,36 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
 
+// Helper to send 2FA OTP Email
+const sendOtpEmail = async (user, otp) => {
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="color: #4f46e5; margin-bottom: 20px;">KnowledgeGraph AI - Two-Factor Verification</h2>
+      <p>Hello ${user.name},</p>
+      <p>Use the following 6-digit one-time passcode (OTP) to complete your verification:</p>
+      <div style="margin: 30px 0; text-align: center;">
+        <span style="font-size: 2.2rem; font-weight: 800; letter-spacing: 0.25em; color: #4f46e5; background-color: #f3f4f6; padding: 12px 24px; border-radius: 8px; display: inline-block;">
+          ${otp}
+        </span>
+      </div>
+      <p>This code is valid for <strong>5 minutes</strong>. If you did not request this, you can safely ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+      <p style="font-size: 0.8rem; color: #64748b;">
+        This is an automated security notification from KnowledgeGraph AI.
+      </p>
+    </div>
+  `;
+
+  const emailMessage = `Your KnowledgeGraph AI verification code is: ${otp}. It is valid for 5 minutes.`;
+
+  return await sendEmail({
+    email: user.email,
+    subject: 'KnowledgeGraph AI - Your 2FA Verification Code',
+    message: emailMessage,
+    html: emailHtml
+  });
+};
+
 // Helper to sign JWTs
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'jwt_secret_placeholder_123', {
@@ -51,10 +81,15 @@ exports.registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const isFirstUser = (await User.countDocuments({})) === 0;
+    const isAdminEmail = email.toLowerCase() === 'admin@example.com';
+    const role = (isFirstUser || isAdminEmail) ? 'Admin' : 'User';
+
     user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      role
     });
 
     res.status(201).json({
@@ -67,6 +102,7 @@ exports.registerUser = async (req, res) => {
         email: user.email,
         phone: user.phone || '',
         avatar: user.avatar || null,
+        role: user.role
       },
     });
   } catch (err) {
@@ -95,6 +131,34 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
+    if (user.twoFactorEnabled) {
+      // Generation of 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const salt = await bcrypt.genSalt(10);
+      user.twoFactorOtp = await bcrypt.hash(otp, salt);
+      user.twoFactorOtpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
+      await user.save();
+
+      console.log(`[SECURITY] 2FA OTP for user ${user.email} generated: ${otp}`);
+
+      let previewUrl = null;
+      try {
+        const mailResult = await sendOtpEmail(user, otp);
+        if (mailResult && mailResult.previewUrl) {
+          previewUrl = mailResult.previewUrl;
+        }
+      } catch (mailErr) {
+        console.error('Failed to send login 2FA OTP email:', mailErr);
+      }
+
+      return res.status(200).json({
+        success: true,
+        require2FA: true,
+        userId: user._id,
+        previewUrl
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: 'User logged in successfully',
@@ -105,6 +169,7 @@ exports.loginUser = async (req, res) => {
         email: user.email,
         phone: user.phone || '',
         avatar: user.avatar || null,
+        role: user.role
       },
     });
   } catch (err) {
@@ -153,6 +218,7 @@ exports.googleLogin = async (req, res) => {
         email: user.email,
         phone: user.phone || '',
         avatar: user.avatar || null,
+        role: user.role
       },
     });
   } catch (err) {
@@ -175,6 +241,8 @@ exports.getMe = async (req, res) => {
         email: req.user.email,
         phone: req.user.phone || '',
         avatar: req.user.avatar || null,
+        twoFactorEnabled: req.user.twoFactorEnabled || false,
+        role: req.user.role || 'User',
         createdAt: req.user.createdAt,
       },
     });
@@ -360,11 +428,158 @@ exports.updateProfile = async (req, res) => {
         email: user.email,
         phone: user.phone || '',
         avatar: user.avatar || null,
+        twoFactorEnabled: user.twoFactorEnabled,
+        role: user.role,
         createdAt: user.createdAt
       }
     });
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ success: false, message: 'Server error during profile update' });
+  }
+};
+
+// Sends OTP code for 2FA activation
+exports.send2FAOtp = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const salt = await bcrypt.genSalt(10);
+    user.twoFactorOtp = await bcrypt.hash(otp, salt);
+    user.twoFactorOtpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
+    await user.save();
+
+    console.log(`[SECURITY] Setup 2FA OTP for user ${user.email}: ${otp}`);
+
+    let previewUrl = null;
+    try {
+      const mailResult = await sendOtpEmail(user, otp);
+      if (mailResult && mailResult.previewUrl) {
+        previewUrl = mailResult.previewUrl;
+      }
+    } catch (mailErr) {
+      console.error('Failed to send setup 2FA OTP email:', mailErr);
+      return res.status(500).json({ success: false, message: 'Could not send verification email' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Verification OTP sent to your email address.',
+      previewUrl
+    });
+  } catch (err) {
+    console.error('Send 2FA OTP error:', err);
+    res.status(500).json({ success: false, message: 'Server error generating 2FA OTP' });
+  }
+};
+
+// Verifies OTP and enable 2FA
+exports.verifyAndEnable2FA = async (req, res) => {
+  const { otp } = req.body;
+  if (!otp) {
+    return res.status(400).json({ success: false, message: 'Please provide the OTP code' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id).select('+twoFactorOtp +twoFactorOtpExpires');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.twoFactorOtp || !user.twoFactorOtpExpires || Date.now() > user.twoFactorOtpExpires) {
+      return res.status(400).json({ success: false, message: 'OTP has expired or is invalid. Please request a new one.' });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.twoFactorOtp);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+    }
+
+    user.twoFactorEnabled = true;
+    user.twoFactorOtp = undefined;
+    user.twoFactorOtpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Two-Factor Authentication has been successfully enabled.'
+    });
+  } catch (err) {
+    console.error('Verify and Enable 2FA error:', err);
+    res.status(500).json({ success: false, message: 'Server error verifying 2FA OTP' });
+  }
+};
+
+// Disables 2FA
+exports.disable2FA = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.twoFactorEnabled = false;
+    user.twoFactorOtp = undefined;
+    user.twoFactorOtpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Two-Factor Authentication has been disabled.'
+    });
+  } catch (err) {
+    console.error('Disable 2FA error:', err);
+    res.status(500).json({ success: false, message: 'Server error disabling 2FA' });
+  }
+};
+
+// Verifying 2FA OTP during Login
+exports.verify2FALogin = async (req, res) => {
+  const { userId, otp } = req.body;
+
+  if (!userId || !otp) {
+    return res.status(400).json({ success: false, message: 'Please provide userId and OTP code' });
+  }
+
+  try {
+    const user = await User.findById(userId).select('+twoFactorOtp +twoFactorOtpExpires');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.twoFactorOtp || !user.twoFactorOtpExpires || Date.now() > user.twoFactorOtpExpires) {
+      return res.status(400).json({ success: false, message: 'Verification code expired or invalid. Please request a new one.' });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.twoFactorOtp);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+    }
+
+    // OTP Verified, clean up and return token
+    user.twoFactorOtp = undefined;
+    user.twoFactorOtpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      token: generateToken(user._id),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        avatar: user.avatar || null,
+        role: user.role
+      },
+    });
+  } catch (err) {
+    console.error('2FA Login verification error:', err);
+    res.status(500).json({ success: false, message: 'Server error verifying 2FA login code' });
   }
 };

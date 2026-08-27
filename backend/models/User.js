@@ -35,6 +35,23 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpire: {
     type: Date,
   },
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false,
+  },
+  twoFactorOtp: {
+    type: String,
+    select: false,
+  },
+  twoFactorOtpExpires: {
+    type: Date,
+    select: false,
+  },
+  role: {
+    type: String,
+    enum: ['User', 'Admin'],
+    default: 'User',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

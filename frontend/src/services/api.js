@@ -134,6 +134,68 @@ export const authService = {
       console.error('Profile update request failed:', error);
       return { success: false, message: 'Server connection error' };
     }
+  },
+
+  // Sends 2fa verification OTP
+  send2FAOtp: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/send-otp`, {
+        method: 'POST',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Sending 2FA OTP failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Verify and enable 2fa
+  verifyAndEnable2FA: async (otp) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/verify-enable`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ otp }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Verifying 2FA activation failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Disable 2FA
+  disable2FA: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/disable`, {
+        method: 'POST',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Disabling 2FA failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Verify login 2fa OTP
+  verify2FALogin: async (userId, otp) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/verify-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, otp }),
+      });
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      return data;
+    } catch (error) {
+      console.error('Verifying 2FA login failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
   }
 };
 

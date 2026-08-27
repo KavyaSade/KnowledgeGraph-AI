@@ -27,7 +27,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   
   // Theme state inherited from localStorage 
-  const [theme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [theme] = useState(() => localStorage.getItem('theme') || 'dark');
   
   // Auth state
   const [user, setUser] = useState(null);
@@ -748,6 +748,8 @@ const Dashboard = () => {
             {/* VIEW 6: USER PROFILE */}
             {activeTab === 'profile' && (
               <Profile
+                user={user}
+                setUser={setUser}
                 editAvatar={editAvatar}
                 setEditAvatar={setEditAvatar}
                 editName={editName}

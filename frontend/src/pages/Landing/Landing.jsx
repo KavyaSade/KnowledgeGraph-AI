@@ -12,7 +12,7 @@ import Footer from '../../components/Layout/Footer';
 const Landing = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
+    return localStorage.getItem('theme') || 'dark';
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
 

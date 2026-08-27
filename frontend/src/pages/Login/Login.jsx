@@ -23,8 +23,42 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isBtnHovered, setIsBtnHovered] = useState(false);
+
+  // 2fa Login States
+  const [show2FA, setShow2FA] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpUserId, setOtpUserId] = useState('');
+  const [otpPreviewUrl, setOtpPreviewUrl] = useState(null);
   
   const navigate = useNavigate();
+
+  const handleOTPSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpCode.trim() || otpCode.trim().length !== 6) {
+      setErrors({ otp: 'Please enter a valid 6-digit passcode.' });
+      return;
+    }
+    setIsLoading(true);
+    setErrors({});
+    try {
+      const res = await authService.verify2FALogin(otpUserId, otpCode.trim());
+      if (res.success) {
+        setIsLoading(false);
+        setIsSuccess(true);
+        if (res.user && res.user.role === 'Admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setIsLoading(false);
+        setErrors({ otp: res.message || 'Verification failed. Please check the code.' });
+      }
+    } catch (err) {
+      setIsLoading(false);
+      setErrors({ otp: 'Connection error during OTP verification.' });
+    }
+  };
 
   const handleValidation = () => {
     let tempErrors = {};
@@ -50,9 +84,22 @@ const Login = () => {
       try {
         const res = await authService.login(email, password);
         if (res.success) {
-          setIsLoading(false);
-          setIsSuccess(true);
-          navigate('/dashboard');
+          if (res.require2FA) {
+            setIsLoading(false);
+            setOtpUserId(res.userId);
+            if (res.previewUrl) {
+              setOtpPreviewUrl(res.previewUrl);
+            }
+            setShow2FA(true);
+          } else {
+            setIsLoading(false);
+            setIsSuccess(true);
+            if (res.user && res.user.role === 'Admin') {
+              navigate('/admin');
+            } else {
+              navigate('/dashboard');
+            }
+          }
         } else {
           setIsLoading(false);
           setErrors({ form: res.message || 'Invalid email or password.' });
@@ -184,6 +231,142 @@ const Login = () => {
                 <p style={{ color: '#666666', fontSize: '0.95rem' }}>
                   Opening your personal knowledge space...
                 </p>
+              </motion.div>
+            ) : show2FA ? (
+              <motion.div
+                key="2fa-screen"
+                variants={pageEntranceVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+              >
+                <motion.div variants={elementVariants} style={{ marginBottom: '1.5rem' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.12em', color: '#666666', display: 'inline-block', marginBottom: '0.35rem' }}>
+                    TWO-FACTOR VERIFICATION
+                  </span>
+                  <h2 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.025em', color: '#111111', lineHeight: '1.25', marginBottom: '0.4rem', fontFamily: "'Manrope', sans-serif" }}>
+                    Verify your identity.
+                  </h2>
+                  <p style={{ color: '#666666', fontSize: '0.9rem' }}>
+                    A one-time passcode has been sent to your registered email address. Enter the code below to sign in.
+                  </p>
+                </motion.div>
+
+                <form onSubmit={handleOTPSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <motion.div variants={elementVariants} className="form-group">
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#111111', marginBottom: '0.25rem' }}>
+                      Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="123456"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      style={{
+                        width: '100%',
+                        height: '42px',
+                        padding: '0 0.85rem',
+                        fontSize: '1.25rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.2em',
+                        textAlign: 'center',
+                        color: '#111111',
+                        backgroundColor: 'transparent',
+                        border: errors.otp ? '1px solid #EF4444' : '1px solid rgba(17, 17, 17, 0.15)',
+                        borderRadius: '4px',
+                        outline: 'none',
+                        transition: 'border-color 0.25s, box-shadow 0.25s'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#4F46E5';
+                        e.target.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.06)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = errors.otp ? '#EF4444' : 'rgba(17, 17, 17, 0.15)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                    {errors.otp && (
+                      <span style={{ display: 'block', color: '#EF4444', fontSize: '0.8rem', marginTop: '0.35rem' }}>
+                        {errors.otp}
+                      </span>
+                    )}
+                  </motion.div>
+
+                  <motion.div variants={elementVariants}>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        backgroundColor: '#111111',
+                        color: '#FAFAF8',
+                        fontSize: '0.85rem',
+                        fontWeight: 500,
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        opacity: isLoading ? 0.75 : 1,
+                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                        transition: 'opacity 0.2s'
+                      }}
+                    >
+                      {isLoading ? 'Verifying...' : 'Verify & Sign In'}
+                    </button>
+                  </motion.div>
+
+                  <motion.div variants={elementVariants} style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShow2FA(false);
+                        setOtpCode('');
+                        setErrors({});
+                        setOtpPreviewUrl(null);
+                      }}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: '#666666',
+                        fontSize: '0.85rem',
+                        textDecoration: 'underline',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Back to login credentials
+                    </button>
+                  </motion.div>
+                </form>
+
+                {otpPreviewUrl && (
+                  <motion.div
+                    variants={elementVariants}
+                    style={{
+                      marginTop: '1.25rem',
+                      padding: '0.85rem',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                      border: '1px dashed rgba(79, 70, 229, 0.3)',
+                      fontSize: '0.8rem',
+                      color: '#4F46E5',
+                      lineHeight: '1.4'
+                    }}
+                  >
+                    <span style={{ fontWeight: 700 }}>Sandbox Notice:</span> Since no live SMTP server is configured, the verification email was routed to an Ethereal inbox. Use the link below to view the passcode:<br />
+                    <a
+                      href={otpPreviewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#0284C7', textDecoration: 'underline', fontWeight: 600, display: 'inline-block', marginTop: '0.35rem' }}
+                    >
+                      Open Ethereal Mail Inbox
+                    </a>
+                  </motion.div>
+                )}
               </motion.div>
             ) : (
               <motion.div
