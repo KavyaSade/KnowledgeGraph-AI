@@ -615,6 +615,104 @@ const drawIcon = (type, ctx, w, h) => {
 
     ctx.restore();
   }
+  else if (type === 'shield') {
+    ctx.save();
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = '#059669';
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = w * 0.08;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.2);
+    ctx.lineTo(w * 0.8, h * 0.25);
+    ctx.quadraticCurveTo(w * 0.8, h * 0.55, w * 0.5, h * 0.82);
+    ctx.quadraticCurveTo(w * 0.2, h * 0.55, w * 0.2, h * 0.25);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+  else if (type === 'chart') {
+    ctx.save();
+    ctx.strokeStyle = '#3B82F6';
+    ctx.shadowColor = '#3B82F6';
+    ctx.beginPath();
+    ctx.moveTo(w * 0.2, h * 0.8);
+    ctx.lineTo(w * 0.8, h * 0.8);
+    ctx.moveTo(w * 0.2, h * 0.8);
+    ctx.lineTo(w * 0.2, h * 0.2);
+    ctx.stroke();
+    
+    ctx.strokeStyle = '#10B981';
+    ctx.shadowColor = '#10B981';
+    ctx.beginPath();
+    ctx.moveTo(w * 0.2, h * 0.7);
+    ctx.lineTo(w * 0.4, h * 0.45);
+    ctx.lineTo(w * 0.6, h * 0.55);
+    ctx.lineTo(w * 0.8, h * 0.3);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'users') {
+    ctx.save();
+    ctx.strokeStyle = '#45F3FF';
+    ctx.shadowColor = '#45F3FF';
+    ctx.beginPath();
+    ctx.arc(w * 0.38, h * 0.38, w * 0.12, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(w * 0.38, h * 0.85, w * 0.22, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = '#6C5CE7';
+    ctx.shadowColor = '#6C5CE7';
+    ctx.beginPath();
+    ctx.arc(w * 0.62, h * 0.38, w * 0.12, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(w * 0.62, h * 0.85, w * 0.22, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'gear') {
+    ctx.save();
+    ctx.strokeStyle = '#FBBF24';
+    ctx.shadowColor = '#FBBF24';
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.5, w * 0.22, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.5, w * 0.1, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      const x1 = w * 0.5 + Math.cos(angle) * (w * 0.2);
+      const y1 = h * 0.5 + Math.sin(angle) * (h * 0.2);
+      const x2 = w * 0.5 + Math.cos(angle) * (w * 0.3);
+      const y2 = h * 0.5 + Math.sin(angle) * (h * 0.3);
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  else if (type === 'terminal') {
+    ctx.save();
+    ctx.strokeStyle = '#10B981';
+    ctx.shadowColor = '#10B981';
+    ctx.beginPath();
+    ctx.moveTo(w * 0.25, h * 0.3);
+    ctx.lineTo(w * 0.45, h * 0.5);
+    ctx.lineTo(w * 0.25, h * 0.7);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(w * 0.52, h * 0.7);
+    ctx.lineTo(w * 0.75, h * 0.7);
+    ctx.stroke();
+    ctx.restore();
+  }
 };
 
 export const getPngIcon = (type) => {

@@ -66,7 +66,11 @@ const Register = () => {
         if (res.success) {
           setIsLoading(false);
           setIsSuccess(true);
-          navigate('/dashboard');
+          if (res.user && res.user.role === 'Admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard');
+          }
         } else {
           setIsLoading(false);
           setErrors({ form: res.message || 'Registration failed.' });
