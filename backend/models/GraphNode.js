@@ -37,6 +37,10 @@ const graphNodeSchema = new mongoose.Schema({
       y: Number,
     },
   },
+  aiSummary: {
+    type: String,
+    default: '',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

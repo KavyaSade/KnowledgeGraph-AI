@@ -1,5 +1,9 @@
 const GraphNode = require('../models/GraphNode');
 const Link = require('../models/Link');
+const relationshipService = require('../services/relationshipService');
+const aiService = require('../services/aiService');
+const searchService = require('../services/searchService');
+const knowledgeService = require('../services/knowledgeService');
 
 // Get complete knowledge graph data for the logged-in user
 exports.getGraphData = async (req, res) => {
@@ -14,6 +18,7 @@ exports.getGraphData = async (req, res) => {
       content: node.content,
       tags: node.tags,
       metadata: node.metadata || {},
+      aiSummary: node.aiSummary || '',
       createdAt: node.createdAt
     }));
 
@@ -65,6 +70,7 @@ exports.createNode = async (req, res) => {
         content: node.content,
         tags: node.tags,
         metadata: node.metadata,
+        aiSummary: node.aiSummary || '',
         createdAt: node.createdAt
       }
     });
@@ -83,33 +89,7 @@ exports.createLink = async (req, res) => {
   }
 
   try {
-    // Verify source and target nodes exist and belong to the user
-    const sourceNode = await GraphNode.findOne({ _id: source, user: req.user.id });
-    const targetNode = await GraphNode.findOne({ _id: target, user: req.user.id });
-
-    if (!sourceNode || !targetNode) {
-      return res.status(404).json({ success: false, message: 'Source or target node not found' });
-    }
-
-    // Check if the link already exists
-    let link = await Link.findOne({
-      user: req.user.id,
-      source,
-      target,
-      label: label || 'connected_to'
-    });
-
-    if (link) {
-      return res.status(400).json({ success: false, message: 'Link already exists between these nodes' });
-    }
-
-    link = await Link.create({
-      user: req.user.id,
-      source,
-      target,
-      label: label || 'connected_to'
-    });
-
+    const link = await relationshipService.createRelationship(req.user.id, source, target, label);
     res.status(201).json({
       success: true,
       message: 'Link created successfully',
@@ -118,12 +98,34 @@ exports.createLink = async (req, res) => {
         source: link.source.toString(),
         target: link.target.toString(),
         label: link.label,
+        strength: link.strength,
         createdAt: link.createdAt
       }
     });
   } catch (err) {
     console.error('Error creating link:', err);
-    res.status(500).json({ success: false, message: 'Server error creating link' });
+    res.status(500).json({ success: false, message: err.message || 'Server error creating link' });
+  }
+};
+
+// Delete a connection between nodes
+exports.deleteLink = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const link = await relationshipService.deleteRelationship(req.user.id, id);
+
+    if (!link) {
+      return res.status(404).json({ success: false, message: 'Link not found or unauthorized' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Link deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error deleting link:', err);
+    res.status(500).json({ success: false, message: 'Server error deleting link' });
   }
 };
 
@@ -160,56 +162,121 @@ exports.searchGraph = async (req, res) => {
   }
 
   try {
-    // Find all nodes matching query in title, content, or tags
-    const matchedNodes = await GraphNode.find({
-      user: req.user.id,
-      $or: [
-        { title: { $regex: q, $options: 'i' } },
-        { content: { $regex: q, $options: 'i' } },
-        { tags: { $in: [new RegExp(q, 'i')] } }
-      ]
-    });
-
-    const formattedNodes = matchedNodes.map(node => ({
-      id: node._id.toString(),
-      type: node.type,
-      title: node.title,
-      content: node.content,
-      tags: node.tags,
-      metadata: node.metadata || {},
-      createdAt: node.createdAt
-    }));
-
-    const matchedNodeIds = formattedNodes.map(n => n.id);
-
-    // Find links that connect the matched nodes
-    const matchedLinks = await Link.find({
-      user: req.user.id,
-      $or: [
-        { source: { $in: matchedNodeIds } },
-        { target: { $in: matchedNodeIds } }
-      ]
-    });
-
-    const formattedLinks = matchedLinks.map(link => ({
-      id: link._id.toString(),
-      source: link.source.toString(),
-      target: link.target.toString(),
-      label: link.label,
-      strength: link.strength,
-      createdAt: link.createdAt
-    }));
-
+    const searchResults = await searchService.search(req.user.id, q);
     res.status(200).json({
       success: true,
       query: q,
-      results: {
-        nodes: formattedNodes,
-        links: formattedLinks,
-      },
+      results: searchResults
     });
   } catch (err) {
     console.error('Search graph error:', err);
     res.status(500).json({ success: false, message: 'Server error during graph search' });
+  }
+};
+
+// Generates AI summary for a single node
+exports.getNodeSummary = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const node = await knowledgeService.getNodeById(req.user.id, id);
+    if (!node) {
+      return res.status(404).json({ success: false, message: 'Node not found or unauthorized' });
+    }
+
+    const relatedNodes = await relationshipService.getRelatedKnowledge(req.user.id, id);
+    const summary = await aiService.generateSummary(node, relatedNodes);
+
+    node.aiSummary = summary;
+    await node.save();
+
+    res.status(200).json({
+      success: true,
+      summary
+    });
+  } catch (err) {
+    console.error('Error generating node summary:', err);
+    res.status(500).json({ success: false, message: err.message || 'Server error generating summary' });
+  }
+};
+
+// Generates combined AI summary for multiple selected nodes
+exports.summarizeSelected = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ success: false, message: 'Please provide array of node ids to summarize' });
+  }
+
+  try {
+    const nodes = await GraphNode.find({ _id: { $in: ids }, user: req.user.id });
+    if (nodes.length !== ids.length) {
+      return res.status(403).json({ success: false, message: 'Unauthorized or invalid node IDs' });
+    }
+
+    const summary = await aiService.generateMultiSummary(nodes);
+    res.status(200).json({
+      success: true,
+      summary
+    });
+  } catch (err) {
+    console.error('Error generating combined summary:', err);
+    res.status(500).json({ success: false, message: err.message || 'Server error generating combined summary' });
+  }
+};
+
+// Generates custom graph insights
+exports.getAIInsights = async (req, res) => {
+  try {
+    const nodes = await GraphNode.find({ user: req.user.id });
+    const links = await Link.find({ user: req.user.id });
+    const insights = await aiService.generateInsights(nodes, links);
+
+    res.status(200).json({
+      success: true,
+      insights
+    });
+  } catch (err) {
+    console.error('Error generating insights:', err);
+    res.status(500).json({ success: false, message: 'Server error generating insights' });
+  }
+};
+
+// Get AI suggested connections for a node
+exports.suggestConnections = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const node = await knowledgeService.getNodeById(req.user.id, id);
+    if (!node) {
+      return res.status(404).json({ success: false, message: 'Node not found or unauthorized' });
+    }
+
+    const allNodes = await knowledgeService.getAllNodes(req.user.id);
+    const suggestions = await aiService.suggestConnections(node, allNodes);
+
+    res.status(200).json({
+      success: true,
+      suggestions
+    });
+  } catch (err) {
+    console.error('Error suggesting connections:', err);
+    res.status(500).json({ success: false, message: 'Server error suggesting connections' });
+  }
+};
+
+// Gets the list of direct related knowledge for a node
+exports.getRelatedKnowledge = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const related = await relationshipService.getRelatedKnowledge(req.user.id, id);
+    res.status(200).json({
+      success: true,
+      related
+    });
+  } catch (err) {
+    console.error('Error fetching related knowledge:', err);
+    res.status(500).json({ success: false, message: 'Server error fetching related knowledge' });
   }
 };
