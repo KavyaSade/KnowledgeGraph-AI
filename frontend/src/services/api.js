@@ -258,6 +258,20 @@ export const graphService = {
     }
   },
 
+  // Delete a graph link (relationship)
+  deleteLink: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/links/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Deleting link failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
   // Conversational natural language search query
   search: async (query) => {
     try {
@@ -268,7 +282,78 @@ export const graphService = {
       return await response.json();
     } catch (error) {
       console.error('Search failed:', error);
-      return { success: false, results: { nodes: [], links: [] } };
+      return { success: false, results: { nodes: [], links: [], answer: '', reasons: {} } };
+    }
+  },
+
+  // Generate AI summary for a node
+  generateNodeSummary: async (nodeId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/nodes/${nodeId}/summary`, {
+        method: 'POST',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Generating node summary failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Generate combined AI summary for multiple selected nodes
+  generateMultiSummary: async (nodeIds) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/nodes/summarize-selected`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ ids: nodeIds }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Generating combined summary failed:', error);
+      return { success: false, message: 'Server connection error' };
+    }
+  },
+
+  // Get AI insights
+  getAIInsights: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/insights`, {
+        method: 'GET',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Fetching AI insights failed:', error);
+      return { success: false, insights: [] };
+    }
+  },
+
+  // Get AI suggested connections
+  getSuggestedConnections: async (nodeId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/nodes/${nodeId}/suggestions`, {
+        method: 'GET',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Fetching suggested connections failed:', error);
+      return { success: false, suggestions: [] };
+    }
+  },
+
+  // Get direct related knowledge nodes
+  getRelatedKnowledge: async (nodeId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/graph/nodes/${nodeId}/related`, {
+        method: 'GET',
+        headers: getHeaders(),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Fetching related knowledge failed:', error);
+      return { success: false, related: [] };
     }
   }
 };

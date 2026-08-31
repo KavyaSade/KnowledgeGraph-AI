@@ -1,5 +1,6 @@
 import React from 'react';
 import { getPngIcon } from '../../utils/pngIcons';
+import InteractiveKnowledgeGraph from '../../components/Dashboard/InteractiveKnowledgeGraph';
 
 const captureIcon = getPngIcon('capture');
 const insightIcon = getPngIcon('brain');
@@ -24,13 +25,14 @@ const Overview = ({
   setDocFile,
   setDocFileName,
   handleCapture,
-  getAIInsights
+  getAIInsights,
+  onNodeClick
 }) => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       
       {/* Stats Cards Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         {[
           { label: 'Captured Nodes', value: nodes.length, color: 'var(--accent-indigo)' },
           { label: 'Active Connections', value: links.length, color: 'var(--accent-cyan)' },
@@ -41,7 +43,7 @@ const Overview = ({
             key={i} 
             className="dashboard-card"
             style={{
-              padding: '1.5rem',
+              padding: '1.15rem 1.35rem',
               borderRadius: '10px',
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--bg-surface)',
@@ -49,9 +51,23 @@ const Overview = ({
             }}
           >
             <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{stat.label}</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, marginTop: '0.4rem', color: stat.color }}>{stat.value}</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: '0.3rem', color: stat.color }}>{stat.value}</div>
           </div>
         ))}
+      </div>
+
+      {/* Visual Centerpiece interactive Knowledge Graph */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+          <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: 0 }}>Active Personal Knowledge Network</h4>
+          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Click node to view details & suggestions, drag to restructure</span>
+        </div>
+        <InteractiveKnowledgeGraph
+          nodes={nodes}
+          links={links}
+          onNodeClick={onNodeClick}
+          height={280}
+        />
       </div>
 
       {/* Dashboard Split Sections */}

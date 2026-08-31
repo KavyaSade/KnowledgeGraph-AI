@@ -20,7 +20,10 @@ const Resources = ({
   setDocFileName,
   handleCapture,
   captureStatus,
-  resourceNodes
+  resourceNodes,
+  selectedNodeIds = [],
+  onToggleSelectNode,
+  onNodeClick
 }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -200,29 +203,50 @@ const Resources = ({
               resourceNodes.map((res) => (
                 <div 
                   key={res.id} 
+                  onClick={() => onNodeClick && onNodeClick(res)}
                   className="dashboard-card"
                   style={{
                     padding: '1.25rem',
                     borderRadius: '10px',
                     border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-surface)'
+                    backgroundColor: 'var(--bg-surface)',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'border 0.2s'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-indigo)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  {/* Checkbox for multi-summarize selection */}
+                  <div 
+                    style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', zIndex: 10 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedNodeIds.includes(res.id)}
+                      onChange={() => onToggleSelectNode && onToggleSelectNode(res.id)}
+                      style={{ cursor: 'pointer', scale: 1.1, accentColor: 'var(--accent-indigo)' }}
+                      title="Select to summarize"
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', marginLeft: '1.8rem' }}>
                     <span style={{ fontSize: '0.6rem', padding: '0.15rem 0.45rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '4px', fontWeight: 750, color: 'var(--accent-emerald)', textTransform: 'uppercase' }}>
                       {res.type}
                     </span>
                   </div>
 
-                  <h5 style={{ fontSize: '0.9rem', fontWeight: 800 }}>{res.title}</h5>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{res.content}</p>
+                  <h5 style={{ fontSize: '0.9rem', fontWeight: 800, marginLeft: '1.8rem' }}>{res.title}</h5>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem', marginLeft: '1.8rem' }}>{res.content}</p>
 
                   {res.metadata && res.metadata.url ? (
-                    <div style={{ marginTop: '0.65rem' }}>
+                    <div style={{ marginTop: '0.65rem', marginLeft: '1.8rem' }}>
                       <a 
                         href={res.metadata.url} 
                         target="_blank" 
                         rel="noreferrer" 
+                        onClick={(e) => e.stopPropagation()}
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -243,10 +267,11 @@ const Resources = ({
                       </span>
                     </div>
                   ) : res.metadata && res.metadata.docFile ? (
-                    <div style={{ marginTop: '0.65rem' }}>
+                    <div style={{ marginTop: '0.65rem', marginLeft: '1.8rem' }}>
                       <a 
                         href={res.metadata.docFile} 
                         download={res.metadata.fileName || 'document'}
+                        onClick={(e) => e.stopPropagation()}
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -260,27 +285,6 @@ const Resources = ({
                         }}
                       >
                         Download: {res.metadata.fileName || 'Document'}
-                      </a>
-                    </div>
-                  ) : res.content.startsWith('http') ? (
-                    <div style={{ marginTop: '0.65rem' }}>
-                      <a 
-                        href={res.content} 
-                        target="_blank" 
-                        rel="noreferrer" 
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          fontSize: '0.7rem',
-                          fontWeight: 700,
-                          color: '#FFFFFF',
-                          backgroundColor: 'var(--accent-emerald)',
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '4px',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        Open URL
                       </a>
                     </div>
                   ) : null}

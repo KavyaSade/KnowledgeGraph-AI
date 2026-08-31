@@ -25,7 +25,10 @@ const Capture = ({
   setOrganizeFilter,
   loadingGraph,
   filteredOrganizeNodes,
-  handleDeleteNode
+  handleDeleteNode,
+  selectedNodeIds = [],
+  onToggleSelectNode,
+  onNodeClick
 }) => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '2rem' }}>
@@ -50,25 +53,44 @@ const Capture = ({
           <div>
             <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.35rem', color: 'var(--text-muted)' }}>Node Type</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-              {['note', 'project', 'person', 'document', 'bookmark', 'idea'].map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setNodeType(type)}
-                  style={{
-                    padding: '0.45rem 0.2rem',
-                    fontSize: '0.7rem',
-                    borderRadius: '4px',
-                    border: nodeType === type ? '1px solid var(--accent-indigo)' : '1px solid var(--border-color)',
-                    backgroundColor: nodeType === type ? 'var(--bg-secondary)' : 'var(--bg-surface)',
-                    color: nodeType === type ? 'var(--accent-indigo)' : 'var(--text-secondary)',
-                    fontWeight: nodeType === type ? 750 : 550,
-                    textTransform: 'capitalize'
-                  }}
-                >
-                  {type}
-                </button>
-              ))}
+              {['note', 'project', 'person', 'document', 'bookmark', 'idea'].map((type) => {
+                const isActive = nodeType === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => {
+                      console.log('Capture Tab: Switched node type to:', type);
+                      setNodeType(type);
+                    }}
+                    style={{
+                      padding: '0.45rem 0.2rem',
+                      fontSize: '0.7rem',
+                      borderRadius: '4px',
+                      border: isActive ? '1px solid var(--accent-indigo)' : '1px solid var(--border-color)',
+                      backgroundColor: isActive ? 'var(--bg-secondary)' : 'var(--bg-surface)',
+                      color: isActive ? 'var(--accent-indigo)' : 'var(--text-secondary)',
+                      fontWeight: isActive ? 800 : 550,
+                      textTransform: 'capitalize',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.25rem',
+                      boxShadow: isActive ? 'inset 0 0 5px rgba(99, 102, 241, 0.15)' : 'none'
+                    }}
+                  >
+                    <span style={{ 
+                      display: 'inline-block', 
+                      width: '6px', 
+                      height: '6px', 
+                      borderRadius: '50%', 
+                      backgroundColor: isActive ? 'var(--accent-indigo)' : 'transparent',
+                      border: isActive ? 'none' : '1px solid var(--text-muted)'
+                    }} />
+                    {type}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -229,18 +251,37 @@ const Capture = ({
             filteredOrganizeNodes.map((node) => (
               <div 
                 key={node.id} 
+                onClick={() => onNodeClick && onNodeClick(node)}
                 className="dashboard-card"
                 style={{
                   padding: '1.5rem',
                   borderRadius: '10px',
                   border: '1px solid var(--border-color)',
                   backgroundColor: 'var(--bg-surface)',
-                  position: 'relative'
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'border 0.2s'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-indigo)'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
               >
+                {/* Checkbox for multi-summarize selection */}
+                <div 
+                  style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', zIndex: 10 }}
+                  onClick={(e) => e.stopPropagation()} 
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedNodeIds.includes(node.id)}
+                    onChange={() => onToggleSelectNode && onToggleSelectNode(node.id)}
+                    style={{ cursor: 'pointer', scale: 1.1, accentColor: 'var(--accent-indigo)' }}
+                    title="Select to summarize"
+                  />
+                </div>
+
                 {/* Trash Delete Action */}
                 <button
-                  onClick={() => handleDeleteNode(node.id)}
+                  onClick={(e) => { e.stopPropagation(); handleDeleteNode(node.id); }}
                   style={{
                     position: 'absolute',
                     top: '1.25rem',
@@ -250,33 +291,35 @@ const Capture = ({
                     padding: '0.25rem',
                     backgroundColor: 'transparent',
                     border: 'none',
-                    outline: 'none'
+                    outline: 'none',
+                    zIndex: 10
                   }}
                   title="Delete Node from local workspace"
                 >
                   {trashIcon && <img src={trashIcon} alt="" style={{ width: 14, height: 14 }} />}
                 </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', marginLeft: '1.8rem' }}>
                   <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', padding: '0.15rem 0.45rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '4px', color: 'var(--accent-indigo)' }}>
                     {node.type}
                   </span>
                 </div>
 
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>{node.title}</h4>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem', lineHeight: '1.45' }}>{node.content}</p>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', marginLeft: '1.8rem' }}>{node.title}</h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem', lineHeight: '1.45', marginLeft: '1.8rem' }}>{node.content}</p>
 
                 {node.metadata && node.metadata.url && (
-                  <a href={node.metadata.url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', fontSize: '0.72rem', color: 'var(--accent-cyan)', marginTop: '0.4rem', textDecoration: 'underline' }}>
+                  <a href={node.metadata.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ display: 'inline-block', fontSize: '0.72rem', color: 'var(--accent-cyan)', marginTop: '0.4rem', textDecoration: 'underline', marginLeft: '1.8rem' }}>
                     Visit Link: {node.metadata.url}
                   </a>
                 )}
 
                 {node.metadata && node.metadata.docFile && (
-                  <div style={{ marginTop: '0.65rem' }}>
+                  <div style={{ marginTop: '0.65rem', marginLeft: '1.8rem' }}>
                     <a 
                       href={node.metadata.docFile} 
                       download={node.metadata.fileName || 'document'}
+                      onClick={(e) => e.stopPropagation()}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -295,7 +338,7 @@ const Capture = ({
                 )}
 
                 {node.tags && node.tags.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.75rem' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.75rem', marginLeft: '1.8rem' }}>
                     {node.tags.map((tag) => (
                       <span key={tag} style={{ fontSize: '0.62rem', padding: '0.1rem 0.35rem', border: '1px solid var(--border-color)', borderRadius: '3px', color: 'var(--text-muted)', backgroundColor: 'var(--bg-secondary)' }}>
                         #{tag}

@@ -2,6 +2,7 @@ import React from 'react';
 import { getPngIcon } from '../../utils/pngIcons';
 
 const networkIcon = getPngIcon('network');
+const trashIcon = getPngIcon('trash');
 
 const Connections = ({
   sourceNodeId,
@@ -14,7 +15,8 @@ const Connections = ({
   connectStatus,
   nodes,
   links,
-  getNodeTitleById
+  getNodeTitleById,
+  handleDeleteLink
 }) => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
@@ -141,7 +143,7 @@ const Connections = ({
                   justifyContent: 'space-between'
                 }}
               >
-                <div style={{ width: '42%', wordBreak: 'break-word' }}>
+                <div style={{ width: '38%', wordBreak: 'break-word' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: 750 }}>{getNodeTitleById(link.source)}</div>
                 </div>
 
@@ -152,8 +154,42 @@ const Connections = ({
                   <span style={{ fontSize: '0.8rem', color: 'var(--border-hover)', marginTop: '-0.1rem' }}>➡</span>
                 </div>
 
-                <div style={{ width: '42%', wordBreak: 'break-word', textAlign: 'right' }}>
+                <div style={{ width: '38%', wordBreak: 'break-word', textAlign: 'right' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: 750 }}>{getNodeTitleById(link.target)}</div>
+                </div>
+
+                <div style={{ width: '8%', display: 'flex', justifyContent: 'flex-end', marginLeft: '0.5rem' }}>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to delete this connection?')) {
+                        handleDeleteLink(link.id);
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: '6px',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: 0.5,
+                      transition: 'all 0.2s ease',
+                      outline: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                      e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = '0.5';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title="Delete Connection"
+                  >
+                    {trashIcon && <img src={trashIcon} alt="Delete" style={{ width: 14, height: 14 }} />}
+                  </button>
                 </div>
               </div>
             ))
